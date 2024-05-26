@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Terminal=false
+Type=Application
+Name=Sb4; Click to start ShopBot
+Exec=/usr/bin/chromium-browser --start-fullscreen --disable-restore-session-state --app=http://localhost:80
+Icon=/home/pi/Pictures/icon.png
+StartupWMClass=crx_ibibgpobdkbalokofchnpkllnjgfddln

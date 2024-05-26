@@ -1,0 +1,6 @@
+PRETTY_NAME="ShopBot Tools FabMo Linux Release on Raspberry Pi OS"
+NAME="ShopBot Tools Digital Fabrication and Motion (FabMo) System"
+VERSION_NUMBER="25.2"
+HOME_URL="https://http://gofabmo.org/"
+SUPPORT_URL=""
+BUG_REPORT_URL=""

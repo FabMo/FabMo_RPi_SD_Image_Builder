@@ -1,0 +1,13 @@
+[Unit]
+Description=Monitor Network Type Setting
+
+[Service]
+ExecStart=/etc/network_conf_fabmo/maintain_network_mode.py
+Type=simple
+User=root
+Restart=always
+SyslogIdentifier=NETSWITCH
+WorkingDirectory = /etc/network_conf_fabmo
+
+[Install]
+WantedBy=multi-user.target

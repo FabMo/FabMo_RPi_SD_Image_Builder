@@ -1,0 +1,19 @@
+desktop-items-0.conf "${ROOTFS_DIR}/etc/xdg/pcmanfm/LXDE-pi/"
+panel "${ROOTFS_DIR}/etc/xdg/lxpanel/LXDE-pi/panels/"
+chrome-ibibgpobdkbalokofchnpkllnjgfddln-Default.desktop "${ROOTFS_DIR}/home/pi/.local/share/applications/"
+
+
+These are files to update and the place they are from and get stored to.
+Put them into /stage5/01-custom-wallpaper-plus in the image builder.
+***you may need to get the modified "panel" from "/home/pi/.config/lxpanel/LXDE-pi/panels/"
+
+
+
+no longer used:
+sb4.desktop "${ROOTFS_DIR}/home/pi/Desktop/"
+
+For touchpad rotation:
+starting with "left for screen" and 90-degree for touch (here)
+90-degree rotation: Option "CalibrationMatrix" "0 1 0 -1 0 1 0 0 1"
+180-degree rotation: Option "CalibrationMatrix" "-1 0 1 0 -1 1 0 0 1"
+270-degree rotation: Option "CalibrationMatrix" "0 -1 1 1 0 0 0 0 1"

@@ -1,0 +1,12 @@
+# These are initial rules for managing multiple USB plugins for Control Card and VFD
+#  - They may need to eventually be built into a more elaborate system for multiple models and versions
+
+# SHOPBOT/FABMO Controller v304 (will not recognize DUE now)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1d50", ATTRS{idProduct}=="606d", SYMLINK+="fabmo_g2_motion"
+
+# Waveshare USB to RS485
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d3", SYMLINK+="vfdACM_controller1"
+# Sparkfun USB to RS485 
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="vfdUSB_controller1"
+# Delta USB to RS485 Std ShopBot 
+SUBSYSTEM=="usb", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="83c4", SYMLINK+="vfdUSB_controller1"
