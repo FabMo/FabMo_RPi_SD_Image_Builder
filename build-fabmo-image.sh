@@ -82,19 +82,32 @@ setup_system() {
 # Copy all network, user utility, and system files
 copy_all_files() {
     # Network Configurations
-#    copy_files "$RESOURCE_DIR/network_conf_fabmo" "$TARGET_DIR/etc/network_conf_fabmo"
-#    copy_files "$RESOURCE_DIR/wpa_supplicant" "$TARGET_DIR/etc/wpa_supplicant"
+    install_file "$RESOURCE_DIR/NetworkManager/NetworkManager.conf" "$TARGET_DIR/etc//NetworkManager/NetworkManager.conf"
+    copy_files "$RESOURCE_DIR/NetworkManager/system-connections" "$TARGET_DIR/etc//NetworkManager/system-connections"
+    # Create or edit the systemd override for dnsmasq
+#    sudo tee /etc/systemd/system/dnsmasq.service.d/override.conf > /dev/null <<EOF
+    [Unit]
+    After=network-online.target
+    Wants=network-online.target
+    EOF
+    # Reload systemd and restart dnsmasq
+    sudo systemctl daemon-reload
+    sudo systemctl restart dnsmasq
+ 
 #    copy_files "$RESOURCE_DIR/hostapd" "$TARGET_DIR/etc/hostapd"
 #    install_file "$RESOURCE_DIR/hostapd/hostapd" "$TARGET_DIR/etc/default/hostapd"
 #    copy_files "$RESOURCE_DIR/dhcp" "$TARGET_DIR/etc/dhcp"
 
     # Network Monitoring and Display Utilities
-    mkdir -p $TARGET_DIR/home/pi/bin
+    mkdir -p $TARGET_DIR/usr/local/bin
+    install_file "$RESOURCE_DIR/network_monitor.sh" "$TARGET_DIR/usr/local/bin/network_monitor.sh"
+    # Make sure we can execute the network monitor script
+    sudo chmod +x /usr/local/bin/network_monitor.sh
 #    copy_files "$RESOURCE_DIR/ip_address_display.py" "$TARGET_DIR/home/pi/bin"
 #    copy_files "$RESOURCE_DIR/ip_address_display.sh" "$TARGET_DIR/home/pi/bin"
 #    copy_files "$RESOURCE_DIR/change_ssid.sh" "$TARGET_DIR/home/pi/bin"
 #    copy_files "$RESOURCE_DIR/ck_eth0.sh" "$TARGET_DIR/home/pi/bin"
-    copy_files "$RESOURCE_DIR/export_network_config_thumb.sh" "$TARGET_DIR/home/pi/bin"
+    copy_files "$RESOURCE_DIR/export_network_config_thumb.sh" "$TARGET_DIR/usr/local/bin"
 
     # User Utilities
     mkdir -p $TARGET_DIR/home/pi/Scripts
@@ -107,7 +120,15 @@ copy_all_files() {
     install_file "$RESOURCE_DIR/99-fabmo-usb.rules" "$TARGET_DIR/etc/udev/rules.d/"
     
     # SystemD Service Files
-    copy_files "$RESOURCE_DIR/fabmo-updater.service" "$TARGET_DIR/etc/systemd/system"
+    copy_files "$RESOURCE_DIR/sysd-services" "$TARGET_DIR/etc/systemd/system"
+    systemctl daemon-reload
+    systemctl enable fabmo.service
+    systemctl enable camera-server-1.service
+    systemctl enable camera-server-2.service
+    systemctl enable fabmo-updater.service
+    systemctl enable export-netcfg-thumbdrive.service
+    systemctl enable export-netcfg-thumbdrive.path
+
 #    copy_files "$RESOURCE_DIR/maintain_network_mode.service" "$TARGET_DIR/etc/systemd/system"
 
     # Boot and User Interface Resources

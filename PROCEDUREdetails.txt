@@ -2,6 +2,7 @@ Procedure to make NEW RPi SD Card Image
 =======================================
 {This is a semi-automated system using the latest standard OS from Raspberry Pi which is modified for FabMo with a script that is run on a RPi.}
 
+A. ##### MAKE the Working-OS-Image
 ** REPLACE 1 and 2 by doing the imaging on the Pi?? **
 ** Check out the new "sdm" system to improve this system and potentially get smaller zipped image for shipping **
 1. Download image from Raspi Foundation Current 64bit Full Image PC and save to a build folder.
@@ -9,18 +10,26 @@ Procedure to make NEW RPi SD Card Image
 3. Run this card once on a Raspberry Pi:
 	- hook up a keyboard/mouse and follow the start-up sequence .... {{details}}
 	- this takes a while because it brings in all the latest updates
-4. Shut down RPi and Bring this card back to PC and use Win32Disk Imager to make the "working-Image" SAVE THIS a MASTER FOR UPDATES for x Months !
-5. Copy this "working-Image" to an SD-card again with Balena Etcher  THIS SD IS FOR our WORKING-BUILD !
-6. Boot up for making this WORKING-BUILD on a Raspberry Pi:
-7.      sudo mkdir /home/pi/Scripts
-8.      copy into this new folder (you can use WinSCP logged on as pi):
-          	build-fabmo-image.sh
-		resources [folder]
+4. Shut down the RPi, remove this card, and Bring it card back to PC.
+5. Use Win32Disk Imager to make the new "Working-OS-Image" SAVE THIS a MASTER FOR UPDATES for x Months !
+
+B. ##### MAKE the FabMo-RPi-Image
+6. Copy this "Working-OS-Image" to an SD-card again with Balena Etcher. THIS now the SD card FOR our WORKING-BUILD !
+7. Boot up for making the WORKING-BUILD on a Raspberry Pi:
+8. THEN DO:
+    sudo mkdir /home/pi/Scripts
+    [copy into this new folder (you can use WinSCP logged on as pi)]:
+      	build-fabmo-image.sh
+	    resources [folder]
 9. RUN: 
 	cd /home/pi/Scripts  
 	sudo ./build-fabmo-image.sh
 
-10. WHEN this is finished running, reboot this card. OK?
-11. This SD card can now be used with the Win32Disk Imager to make our NEW FabMo RPi IMAGE
-      	(it can also be copied on the RPi for local copies).
+
+10. WHEN this is finished running, check to make sure things got installed and permissions look right.
+10. Reboot this card. Hopefully everything comes up looking as it should?
+11. This SD card can now be used with the Win32Disk Imager to make our NEW FabMo-RPi-Image
+      	(it can also be copied from this RPi for quick copies).
+        [to manage size of the ultimate zipped imaged file ...]
+        
 
