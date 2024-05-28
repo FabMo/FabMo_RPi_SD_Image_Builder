@@ -1,0 +1,13 @@
+[Unit]
+Description=FabMo Updater
+
+[Service]
+ExecStart=/usr/bin/node /fabmo-updater/server.js &
+Type=simple
+User=root
+Restart=on-failure
+WorkingDirectory = /fabmo-updater/
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

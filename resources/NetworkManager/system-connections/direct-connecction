@@ -1,0 +1,17 @@
+[connection]
+id=direct-connection
+uuid=88544818-a952-412f-b0ed-1fa3914f7bc5
+type=ethernet
+autoconnect=false
+interface-name=eth0
+
+[ethernet]
+
+[ipv4]
+address1=192.168.44.1/24
+method=manual
+
+[ipv6]
+method=ignore
+
+[proxy]

@@ -1,0 +1,15 @@
+[connection]
+id=lan-connection
+uuid=63e93c4b-6add-4e74-a3d2-6cd4004c9fbb
+type=ethernet
+interface-name=eth0
+
+[ethernet]
+
+[ipv4]
+method=auto
+
+[ipv6]
+method=ignore
+
+[proxy]
