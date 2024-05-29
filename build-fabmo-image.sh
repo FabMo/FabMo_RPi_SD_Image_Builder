@@ -102,7 +102,7 @@ EOF
 
     # Network Monitoring and Display Utilities
     mkdir -p /usr/local/bin
-    install_file "$RESOURCE_DIR/urs-local-bin/network_monitor.sh" "/usr/local/bin/network_monitor.sh"
+    install_file "$RESOURCE_DIR/usr-local-bin/network_monitor.sh" "/usr/local/bin/network_monitor.sh"
     sudo chmod +x /usr/local/bin/network_monitor.sh
     copy_files "$RESOURCE_DIR/export_network_config_thumb.sh" "/usr/local/bin"
 
