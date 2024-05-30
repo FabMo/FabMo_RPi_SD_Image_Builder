@@ -1,6 +1,7 @@
 Procedure to make NEW RPi SD Card Image
 =======================================
-{This is a semi-automated system using the latest standard OS from Raspberry Pi which is modified for FabMo with a script that is run on a RPi.}
+{This is a semi-automated system using the latest standard OS from Raspberry Pi which is modified for FabMo with a
+   script that is run on a RPi.}
 
 A. ##### MAKE the Working-OS-Image
 ** REPLACE 1 and 2 by doing the imaging on the Pi?? **
@@ -10,26 +11,39 @@ A. ##### MAKE the Working-OS-Image
 3. Run this card once on a Raspberry Pi:
 	- hook up a keyboard/mouse and follow the start-up sequence .... {{details}}
 	- this takes a while because it brings in all the latest updates
-4. Shut down the RPi, remove this card, and Bring it card back to PC.
-5. Use Win32Disk Imager to make the new "Working-OS-Image" SAVE THIS a MASTER FOR UPDATES for x Months !
+4. Shut down the RPi, remove this card, and bring the card back to PC.
+5. Use Win32Disk Imager to make the new "Working-OS-Image" SAVE THIS a ==MASTER== FOR UPDATES for x Months !
 
-B. ##### MAKE the FabMo-RPi-Image
-6. Copy this "Working-OS-Image" to an SD-card again with Balena Etcher. THIS now the SD card FOR our WORKING-BUILD !
-7. Boot up for making the WORKING-BUILD on a Raspberry Pi:
+B. ##### MAKE the FabMo-RPi-SD-Image
+6. Copy this "Working-OS-Image" to an SD-card, again with Balena Etcher. THIS now the SD card FOR our FabMo-RPi-SD-Image BUILD !
+7. Boot up this card up on a Raspberry Pi:
 8. THEN DO:
     sudo mkdir /home/pi/Scripts
     [copy into this new folder (you can use WinSCP logged on as pi)]:
       	build-fabmo-image.sh
-	    resources [folder]
+	resources [folder]
 9. RUN: 
 	cd /home/pi/Scripts  
 	sudo ./build-fabmo-image.sh
 
-
-10. WHEN this is finished running, check to make sure things got installed and permissions look right.
-10. Reboot this card. Hopefully everything comes up looking as it should?
-11. This SD card can now be used with the Win32Disk Imager to make our NEW FabMo-RPi-Image
-      	(it can also be copied from this RPi for quick copies).
-        [to manage size of the ultimate zipped imaged file ...]
+10. WHEN the script is finished running, check to make sure things got installed and permissions look right.
+11. Reboot this card as a test. Hopefully everything comes up looking as it should?
+12. This SD card can now be used with the Win32Disk Imager to make our NEW FabMo-RPi-Image
+      	(it can also be copied from this RPi for quick copies or copied to a smaller card to minimize the zipped image file).
         
+Some details:
+    = The BUILD script creates symlink for many of the systemd service files that FabMo uses. This is done so that the functions
+         that these files support can be managed in fabmo folders, along with fabmo. Thus if they are updated a new build is
+         not required as they will be updated along with fabmo (of fabmo-updater). This means one needs to attend to keeping
+         these files current in fabmo and fabmo-updater. Currently they are:
+               /fabmo/files:
+                   fabmo.service
+                   network-monitor.service
+                   camera-server-1.service
+                   camera-server-2.service
+                   export-netcfg-thumbdrive.service
+                   export-netcfg-thumbdrive.path
+               /fabmo-updater/files:
+                   fabmo-updater.service
+
 

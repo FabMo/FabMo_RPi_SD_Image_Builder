@@ -111,5 +111,3 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-#pcmanfm -w /home/pi/Pictures/desktop-background.png
-  

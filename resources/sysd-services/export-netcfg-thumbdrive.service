@@ -1,5 +1,0 @@
-[Unit]
-Description=Run script to export network configuration to a thumbdrive
-
-[Service]
-ExecStart=/usr/local/bin/export_network_config_thumb.sh
