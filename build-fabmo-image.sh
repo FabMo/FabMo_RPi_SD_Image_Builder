@@ -46,7 +46,7 @@ install_packages_and_configure() {
     wait_for_dpkg_lock
     echo "Updating package lists..."
     apt-get update
-    apt-get install -y bossa-cli hostapd dnsmasq vim onboard xserver-xorg-input-libinput pi-package jackd2
+    apt-get install -y bossa-cli hostapd dnsmasq onboard xserver-xorg-input-libinput pi-package jackd2
     # Preconfigure jackd2 (audio) to allow real-time process priority
     debconf-set-selections <<< "jackd2 jackd/tweak_rt_limits boolean true"
     echo "Packages installed."
@@ -102,18 +102,12 @@ copy_all_files() {
     install_file "$RESOURCE_DIR/NetworkManager/NetworkManager.conf" "/etc/NetworkManager/NetworkManager.conf"
     # NetworkManager system-connections
     copy_files "$RESOURCE_DIR/NetworkManager/system-connections" "/etc/NetworkManager/system-connections"
-
-#NOW DONW LATER
-#     # Create or edit the systemd override for dnsmasq
-#     mkdir -p /etc/systemd/system/dnsmasq.service.d
-#     sudo tee /etc/systemd/system/dnsmasq.service.d/override.conf > /dev/null <<EOF
-#     [Unit]
-#     After=network-online.target
-#     Wants=network-online.target
-# EOF
-#     # Reload restart dnsmasq
-#     sudo systemctl daemon-reload
-#     sudo systemctl restart dnsmasq
+    # NetworkManager make sure we have the right permissions on these files, they are sensitive
+    chmod 600 /etc/NetworkManager/system-connections/*
+    # Key dnsmasq configuration files
+    install_file "$RESOURCE_DIR/dnsmasq.conf" "/etc/dnsmasq.conf"
+    # Make sure we have the right permissions on this file, it is sensitive
+    chmod 755 /etc/dnsmasq.conf
 
     # Network Monitoring and IP Display Utilities for FabMo along with some usable diagnostic scripts
     mkdir -p /usr/local/bin
@@ -161,7 +155,9 @@ setup_fabmo() {
     echo "cloning fabmo-engine"
     git clone https://github.com/FabMo/FabMo-Engine.git /fabmo
     cd /fabmo
+    echo "installing fabmo-engine"
     npm install
+    echo "building fabmo-engine"
     npm run build 
 
     echo "cloning fabmo-updater"
@@ -177,14 +173,10 @@ setup_fabmo() {
 # SystemD
 load_and_initialize_systemd_services() {
     echo "Setting up systemd services..."
-    #Generic SystemD Service Files not covered by FabMo or Updater 
-    copy_files "$RESOURCE_DIR/sysd-services/" "/etc/systemd/system"
-    systemctl daemon-reload
-    systemctl enable network-monitor.service
 
     # FabMo and Updater SystemD Service symlinks to files
-    #cd /etc/systemd/system
-    #echo "Creating systemd sym-links from fabmo ..."
+    cd /etc/systemd/system
+    echo "Creating systemd sym-links from fabmo ..."
     SERVICES=("fabmo.service" "network-monitor.service" "camera-server-1.service" "camera-server-2.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
     # Loop through the services and create symlinks
     for SERVICE in "${SERVICES[@]}"; do
@@ -214,11 +206,6 @@ load_and_initialize_systemd_services() {
         fi
     done
     
-    # # Create or edit the systemd override for dnsmasq
-    # if [ ! -f /usr/lib/systemd/system/dnsmasq.service ]; then
-    #     ln -s /usr/lib/systemd/system/dnsmasq.service .
-    #     echo "Created /usr/lib/systemd/system/dnsmasq.service"
-    # fi
     # Create or edit the systemd override for dnsmasq
     mkdir -p /etc/systemd/system/dnsmasq.service.d
     sudo tee /etc/systemd/system/dnsmasq.service.d/override.conf > /dev/null <<EOF
@@ -226,6 +213,11 @@ load_and_initialize_systemd_services() {
     After=network-online.target
     Wants=network-online.target
 EOF
+
+    # Make sure files in /fabmo/files are executable
+    chmod +x /fabmo/files/*
+    # Make sure files in /fabmo-updater/files are executable
+    chmod +x /fabmo-updater/files/*
 
     echo "Enabling systemd services..."
     systemctl daemon-reload
