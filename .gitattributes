@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
-* text=auto
+* text=auto eol=lf
+
+## to change endings for all existing files run the following command (only for current working directory)
+## git add --renormalize . 
+
