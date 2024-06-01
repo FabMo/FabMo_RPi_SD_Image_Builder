@@ -103,6 +103,7 @@ copy_all_files() {
     # NetworkManager system-connections
     copy_files "$RESOURCE_DIR/NetworkManager/system-connections" "/etc/NetworkManager/system-connections"
 
+#NOW DONW LATER
 #     # Create or edit the systemd override for dnsmasq
 #     mkdir -p /etc/systemd/system/dnsmasq.service.d
 #     sudo tee /etc/systemd/system/dnsmasq.service.d/override.conf > /dev/null <<EOF
@@ -182,9 +183,9 @@ load_and_initialize_systemd_services() {
     systemctl enable network-monitor.service
 
     # FabMo and Updater SystemD Service symlinks to files
-    cd /etc/systemd/system
-    echo "Creating systemd sym-links from fabmo ..."
-    SERVICES=("fabmo.service" "camera-server-1.service" "camera-server-2.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
+    #cd /etc/systemd/system
+    #echo "Creating systemd sym-links from fabmo ..."
+    SERVICES=("fabmo.service" "network-monitor.service" "camera-server-1.service" "camera-server-2.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
     # Loop through the services and create symlinks
     for SERVICE in "${SERVICES[@]}"; do
         if [ -f "/fabmo/files/$SERVICE" ]; then
@@ -230,7 +231,7 @@ EOF
     systemctl daemon-reload
     systemctl enable fabmo.service
     systemctl enable fabmo-updater.service
-#    systemctl enable network-monitor.service
+    systemctl enable network-monitor.service
     systemctl enable camera-server-1.service
     systemctl enable camera-server-2.service
     systemctl enable export-netcfg-thumbdrive.service

@@ -60,6 +60,7 @@ monitor_network() {
         STATE=$(/usr/bin/nmcli device status | /bin/grep $INTERFACE | /usr/bin/awk '{print $3}')
         CURRENT_IP=$(get_current_ip)
 
+        log ""
         log "State: $STATE, IP: $CURRENT_IP"
 
         case "$STATE" in
@@ -73,7 +74,6 @@ monitor_network() {
                         bring_up_profile "$PC_PROFILE"
                         restart_dnsmasq_if_needed "direct"
                     fi
-                    restart_dnsmasq # seem to need this for direct
                 else
                     log "LAN profile detected. Ensuring LAN profile is active."
                     if ! check_active_profile "$LAN_PROFILE"; then
@@ -84,7 +84,7 @@ monitor_network() {
                 fi
                 reset_failure_count
                 ;;
-            disconnected|connecting) #could also use unavailable
+            disconnected|connecting)
                 log "$INTERFACE is has disconnected or trying to connect."
                 log "$INTERFACE is $STATE."
                 if [ -f $FAIL_COUNT_FILE ]; then
@@ -95,7 +95,7 @@ monitor_network() {
                 fi
                 echo $FAIL_COUNT > $FAIL_COUNT_FILE
                 log "Failure count incremented to $FAIL_COUNT"
-                if [ "$FAIL_COUNT" -ge 1 ]; then
+                if [ "$FAIL_COUNT" -ge 2 ]; then
                     log "Failure count exceeded. Switching to Direct PC profile."
                     bring_down_profile "$LAN_PROFILE"
                     bring_up_profile "$PC_PROFILE"
@@ -114,7 +114,7 @@ monitor_network() {
                 ;;
         esac
 
-        sleep 3
+        sleep 5
     done
 }
 
