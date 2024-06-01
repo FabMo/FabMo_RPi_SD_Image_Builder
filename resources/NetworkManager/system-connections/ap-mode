@@ -1,0 +1,15 @@
+[connection]
+id=ap-mode
+uuid=cb379ca1-2d2b-49c2-8faf-262c5e11acb2
+type=wifi
+interface-name=uap0
+
+[wifi]
+mode=ap
+ssid=fabmoAP
+
+[wifi-security]
+
+
+[ipv4]
+method=shared

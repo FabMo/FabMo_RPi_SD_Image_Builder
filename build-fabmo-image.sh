@@ -18,11 +18,18 @@ wait_for_dpkg_lock() {
     done
 }
 
-# Function to copy files with logging
+# # Function to copy files with logging
+# copy_files() {
+#     echo "Copying files from $1 to $2..."
+#     mkdir -p "$(dirname "$2")"
+#     cp -r $1 $2
+#     echo "Files copied from $1 to $2"
+# }
+
 copy_files() {
     echo "Copying files from $1 to $2..."
-    mkdir -p "$(dirname "$2")"
-    cp -r $1 $2
+    mkdir -p "$2"
+    cp -r "$1"/* "$2"
     echo "Files copied from $1 to $2"
 }
 
@@ -113,8 +120,8 @@ copy_all_files() {
 
     # User Utilities
     mkdir -p /home/pi/Scripts
-    copy_files "$RESOURCE_DIR/fabmo.bashrc" "/home/pi/.bashrc"
-    copy_files "$RESOURCE_DIR/dev-build.sh" "/home/pi/Scripts"
+    install_file "$RESOURCE_DIR/fabmo.bashrc" "/home/pi/.bashrc"
+    install_file "$RESOURCE_DIR/dev-build.sh" "/home/pi/Scripts"
 
     # Key USB symlink file for FabMo and VFD
     install_file "$RESOURCE_DIR/99-fabmo-usb.rules" "/etc/udev/rules.d/"
@@ -124,7 +131,7 @@ copy_all_files() {
     install_file "$RESOURCE_DIR/shopbot-pi-bkgnd.png" "/home/pi/Pictures/shopbot-pi-bkgnd.png"
     install_file "$RESOURCE_DIR/FabMo-Icon-03.png" "/home/pi/Pictures/FabMo-Icon-03.png"
     install_file "$RESOURCE_DIR/icon.png" "/home/pi/Pictures/icon.png"
-  #  plymouth-set-default-theme --rebuild-initrd pix
+    plymouth-set-default-theme --rebuild-initrd pix
     install_file "$RESOURCE_DIR/fabmo_linux_version.txt" "/boot"
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/etc"
 
@@ -169,8 +176,8 @@ setup_fabmo() {
 # SystemD
 load_and_initialize_systemd_services() {
     echo "Setting up systemd services..."
-    Generic SystemD Service Files not covered by FabMo or Updater
-    copy_files "$RESOURCE_DIR/sysd-services" "/etc/systemd/system"
+    #Generic SystemD Service Files not covered by FabMo or Updater 
+    copy_files "$RESOURCE_DIR/sysd-services/" "/etc/systemd/system"
     systemctl daemon-reload
     systemctl enable network-monitor.service
 
@@ -190,8 +197,8 @@ load_and_initialize_systemd_services() {
         else
             echo "Source file /fabmo/files/$SERVICE does not exist"
         fi
-    done    # echo "Creating systemd sym-links from fabmo-updater ..."
-
+    done    
+    echo "Creating systemd sym-links from fabmo-updater ..."
     SERVICES=("fabmo-updater.service")
     for SERVICE in "${SERVICES[@]}"; do
         if [ -f "/fabmo-updater/files/$SERVICE" ]; then
@@ -223,7 +230,7 @@ EOF
     systemctl daemon-reload
     systemctl enable fabmo.service
     systemctl enable fabmo-updater.service
-    systemctl enable network-monitor.service
+#    systemctl enable network-monitor.service
     systemctl enable camera-server-1.service
     systemctl enable camera-server-2.service
     systemctl enable export-netcfg-thumbdrive.service
@@ -239,12 +246,12 @@ main_installation() {
     echo ""
     echo "BUILDING FabMo SD-Card IMAGE ==========================================================="
     echo ""
-#    clean
-#    install_packages_and_configure
+    clean
+    install_packages_and_configure
     setup_system
     copy_all_files
     setup_desktop_environment
-#    setup_fabmo
+    setup_fabmo
     cd /home/pi
     load_and_initialize_systemd_services
     echo "BUILD, Installation, and Configuration Complete. ==============(remove BUILD files?)===="

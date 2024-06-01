@@ -4,6 +4,7 @@ uuid=88544818-a952-412f-b0ed-1fa3914f7bc5
 type=ethernet
 autoconnect=false
 interface-name=eth0
+timestamp=1717086367
 
 [ethernet]
 
