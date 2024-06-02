@@ -46,7 +46,7 @@ install_packages_and_configure() {
     wait_for_dpkg_lock
     echo "Updating package lists..."
     apt-get update
-    apt-get install -y bossa-cli hostapd dnsmasq onboard xserver-xorg-input-libinput pi-package jackd2
+    apt-get install -y bossa-cli hostapd dnsmasq dhcpcd5 onboard xserver-xorg-input-libinput pi-package jackd2
     # Preconfigure jackd2 (audio) to allow real-time process priority
     debconf-set-selections <<< "jackd2 jackd/tweak_rt_limits boolean true"
     echo "Packages installed."
@@ -229,6 +229,9 @@ EOF
     systemctl enable export-netcfg-thumbdrive.service
     systemctl enable export-netcfg-thumbdrive.path
     systemctl enable dnsmasq
+    systemctl unmask hostapd
+    systemctl enable hostapd
+    systemctl enable dhcpcd
 
     echo "Systemd services setup complete."
     echo ""
@@ -239,13 +242,13 @@ main_installation() {
     echo ""
     echo "BUILDING FabMo SD-Card IMAGE ==========================================================="
     echo ""
-    clean
-    install_packages_and_configure
-    setup_system
-    copy_all_files
-    setup_desktop_environment
-    setup_fabmo
-    cd /home/pi
+    # clean
+    # install_packages_and_configure
+    # setup_system
+    # copy_all_files
+    # setup_desktop_environment
+    # setup_fabmo
+    # cd /home/pi
     load_and_initialize_systemd_services
     echo "BUILD, Installation, and Configuration Complete. ==============(remove BUILD files?)===="
     echo ""
