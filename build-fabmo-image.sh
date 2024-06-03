@@ -46,7 +46,7 @@ install_packages_and_configure() {
     wait_for_dpkg_lock
     echo "Updating package lists..."
     apt-get update
-    apt-get install -y bossa-cli hostapd dnsmasq dhcpcd5 onboard xserver-xorg-input-libinput pi-package jackd2
+    apt-get install -y bossa-cli hostapd dnsmasq onboard xserver-xorg-input-libinput pi-package jackd2
     # Preconfigure jackd2 (audio) to allow real-time process priority
     debconf-set-selections <<< "jackd2 jackd/tweak_rt_limits boolean true"
     echo "Packages installed."
@@ -98,20 +98,39 @@ setup_system() {
 # Copy all network, user utility, and system files
 copy_all_files() {
     echo "Copying network, user utility, and system files..."
-    # Network Configurations
+    # NetworkManager Configurations
     install_file "$RESOURCE_DIR/NetworkManager/NetworkManager.conf" "/etc/NetworkManager/NetworkManager.conf"
     # NetworkManager system-connections
     copy_files "$RESOURCE_DIR/NetworkManager/system-connections" "/etc/NetworkManager/system-connections"
     # NetworkManager make sure we have the right permissions on these files, they are sensitive
     chmod 600 /etc/NetworkManager/system-connections/*
-    # Key dnsmasq configuration files
-    install_file "$RESOURCE_DIR/dnsmasq.conf" "/etc/dnsmasq.conf"
+    # hostapd configuration file
+    mkdir -p /etc/hostapd
+    install_file "$RESOURCE_DIR/hostapd/hostapd.conf" "/etc/hostapd/hostapd.conf"
+    # install hostapd service file
+    install_file "$RESOURCE_DIR/sysd-services/hostapd.service" "/lib/systemd/system/hostapd.service"
+    # Create the directory for hostapd PID file
+    mkdir -p /run/hostapd
+    chown root:root /run/hostapd
+    chmod 755 /run/hostapd
+    systemctl unmask hostapd
+    systemctl daemon-reload
+    systemctl enable hostapd
+    # Key dnsmasq configuration file
+    install_file "$RESOURCE_DIR/dnsmasq/dnsmasq.conf" "/etc/dnsmasq.conf"
     # Make sure we have the right permissions on this file, it is sensitive
     chmod 755 /etc/dnsmasq.conf
+    systemctl enable dnsmasq
+    # install hostapd service file
+    install_file "$RESOURCE_DIR/sysd-services/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
 
     # Network Monitoring and IP Display Utilities for FabMo along with some usable diagnostic scripts
     mkdir -p /usr/local/bin
     copy_files "$RESOURCE_DIR/usr-local-bin" "/usr/local/bin"
+    # Make sure we have the right permissions on these files, they are sensitive
+    chmod 755 /usr/local/bin/*
+    systemctl daemon-reload
+    systemctl enable setup-wlan0_ap
 
     # User Utilities
     mkdir -p /home/pi/Scripts
@@ -228,10 +247,9 @@ EOF
     systemctl enable camera-server-2.service
     systemctl enable export-netcfg-thumbdrive.service
     systemctl enable export-netcfg-thumbdrive.path
-    systemctl enable dnsmasq
-    systemctl unmask hostapd
-    systemctl enable hostapd
-    systemctl enable dhcpcd
+    #systemctl enable dnsmasq
+    #systemctl unmask hostapd
+    #systemctl enable hostapd
 
     echo "Systemd services setup complete."
     echo ""
@@ -242,13 +260,13 @@ main_installation() {
     echo ""
     echo "BUILDING FabMo SD-Card IMAGE ==========================================================="
     echo ""
-    # clean
-    # install_packages_and_configure
-    # setup_system
-    # copy_all_files
-    # setup_desktop_environment
-    # setup_fabmo
-    # cd /home/pi
+    clean
+    install_packages_and_configure
+    setup_system
+    copy_all_files
+    setup_desktop_environment
+    setup_fabmo
+    cd /home/pi
     load_and_initialize_systemd_services
     echo "BUILD, Installation, and Configuration Complete. ==============(remove BUILD files?)===="
     echo ""

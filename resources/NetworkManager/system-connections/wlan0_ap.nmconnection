@@ -1,0 +1,16 @@
+[connection]
+id=wlan0_ap
+type=wifi
+interface-name=wlan0_ap
+autoconnect=true
+
+[wifi]
+mode=ap
+ssid=fabmoAP
+
+[ipv4]
+method=manual
+address1=192.168.42.1/24
+
+[ipv6]
+method=ignore
