@@ -238,10 +238,8 @@ load_and_initialize_systemd_services() {
     After=network-online.target
     Wants=network-online.target
 EOF
-    # Install autostart for ip-reporting 
-    install_file "/fabmo/files/network_conf_fabmo/autostart" "/etc/xdg/lxsession/LXDE-pi/autostart"
-    # Make sure file /etc/xdg/lxsession/LXDE-pi/autostart is executable
-    chmod +x /etc/xdg/lxsession/LXDE-pi/autostart
+    # Install autostart for ip-reporting, method should work for generic user in bookworm 
+    install_file "/fabmo/files/network_conf_fabmo/fabmo-ip-reporting.desktop" "/etc/xdg/autostart/fabmo-ip-reporting.desktop"
     
     # Make sure files in /fabmo/files are executable
     chmod +x /fabmo/files/*
