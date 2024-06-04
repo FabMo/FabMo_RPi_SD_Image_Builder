@@ -195,8 +195,8 @@ load_and_initialize_systemd_services() {
 
     # FabMo and Updater SystemD Service symlinks to files
     cd /etc/systemd/system
-    echo "Creating systemd sym-links from fabmo ..."
-    SERVICES=("fabmo.service" "network-monitor.service" "camera-server-1.service" "camera-server-2.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
+    echo "Creating systemd sym-links from fabmo/files ..."
+    SERVICES=("fabmo.service" "camera-server-1.service" "camera-server-2.service")
     # Loop through the services and create symlinks
     for SERVICE in "${SERVICES[@]}"; do
         if [ -f "/fabmo/files/$SERVICE" ]; then
@@ -208,6 +208,20 @@ load_and_initialize_systemd_services() {
             fi
         else
             echo "Source file /fabmo/files/$SERVICE does not exist"
+        fi
+    done    
+    echo "Creating systemd sym-links from fabmo/files/network_conf_fabmo ..."
+    SERVICES=("network-monitor.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
+    for SERVICE in "${SERVICES[@]}"; do
+        if [ -f "/fabmo/files/$SERVICE" ]; then
+            if [ ! -L "/etc/systemd/system/$SERVICE" ]; then
+                ln -s "/fabmo/files/network_conf_fabmo/$SERVICE" .
+                echo "Created symlink for /fabmo/files/network_conf_fabmo/$SERVICE"
+            else
+                echo "Symlink for /fabmo/files/network_conf_fabmo/$SERVICE already exists"
+            fi
+        else
+            echo "Source file /fabmo/files/network_conf_fabmo/$SERVICE does not exist"
         fi
     done    
     echo "Creating systemd sym-links from fabmo-updater ..."
@@ -232,11 +246,17 @@ load_and_initialize_systemd_services() {
     After=network-online.target
     Wants=network-online.target
 EOF
-
+    # Install autostart for ip-reporting 
+    install_file "/fabmo/files/network_conf_fabmo/autostart" "/etc/xdg/lxsession/LXDE-pi/autostart"
+    # Make sure file /etc/xdg/lxsession/LXDE-pi/autostart is executable
+    chmod +x /etc/xdg/lxsession/LXDE-pi/autostart
+    
     # Make sure files in /fabmo/files are executable
     chmod +x /fabmo/files/*
     # Make sure files in /fabmo-updater/files are executable
     chmod +x /fabmo-updater/files/*
+    # Make sure files in /fabmo/files/network_conf_fabmo are executable
+    chmod +x /fabmo/files/network_conf_fabmo/*    
 
     echo "Enabling systemd services..."
     systemctl daemon-reload
