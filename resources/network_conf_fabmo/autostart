@@ -1,4 +1,4 @@
 @lxpanel --profile LXDE-pi
 @pcmanfm --desktop --profile LXDE-pi
 @xscreensaver -no-splash
-@/home/pi/bin/ip_address_display.sh
+@/fabmo/files/network_conf_fabmo/ip-reporting.sh
