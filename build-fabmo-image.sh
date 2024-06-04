@@ -154,7 +154,6 @@ setup_desktop_environment() {
     # Copy configuration files  
     cp $RESOURCE_DIR/desktop-items-0.conf /etc/xdg/pcmanfm/LXDE-pi/ 
     cp $RESOURCE_DIR/panel /etc/xdg/lxpanel/LXDE-pi/panels/ 
-    cp $RESOURCE_DIR/autostart /etc/xdg/lxsession/LXDE-pi/ 
     cp $RESOURCE_DIR/chrome-ibibgpobdkbalokofchnpkllnjgfddln-Default.desktop /home/pi/.local/share/applications/ 
     cp $RESOURCE_DIR/40-libinput.conf /etc/X11/xorg.conf.d/ 
     echo "Desktop environment set up."
