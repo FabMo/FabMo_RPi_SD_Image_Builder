@@ -18,14 +18,6 @@ wait_for_dpkg_lock() {
     done
 }
 
-# # Function to copy files with logging
-# copy_files() {
-#     echo "Copying files from $1 to $2..."
-#     mkdir -p "$(dirname "$2")"
-#     cp -r $1 $2
-#     echo "Files copied from $1 to $2"
-# }
-
 copy_files() {
     echo "Copying files from $1 to $2..."
     mkdir -p "$2"
@@ -213,7 +205,7 @@ load_and_initialize_systemd_services() {
     echo "Creating systemd sym-links from fabmo/files/network_conf_fabmo ..."
     SERVICES=("network-monitor.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
     for SERVICE in "${SERVICES[@]}"; do
-        if [ -f "/fabmo/files/$SERVICE" ]; then
+        if [ -f "/fabmo/files/network_conf_fabmo/$SERVICE" ]; then
             if [ ! -L "/etc/systemd/system/$SERVICE" ]; then
                 ln -s "/fabmo/files/network_conf_fabmo/$SERVICE" .
                 echo "Created symlink for /fabmo/files/network_conf_fabmo/$SERVICE"
