@@ -137,9 +137,13 @@ copy_all_files() {
     install_file "$RESOURCE_DIR/shopbot-pi-bkgnd.png" "/home/pi/Pictures/shopbot-pi-bkgnd.png"
     install_file "$RESOURCE_DIR/FabMo-Icon-03.png" "/home/pi/Pictures/FabMo-Icon-03.png"
     install_file "$RESOURCE_DIR/icon.png" "/home/pi/Pictures/icon.png"
+    install_file "$RESOURCE_DIR/xShopBot4.ico" "/home/pi/Pictures/xShopBot4.ico"
     plymouth-set-default-theme --rebuild-initrd pix
     install_file "$RESOURCE_DIR/fabmo_linux_version.txt" "/boot"
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/etc"
+
+    # Install the wf-panel-pi.ini to get some panel items in the menu
+    install_file "$RESOURCE_DIR/wf-panel-pi.ini" "/home/pi/.config/wf-panel-pi.ini"
 
     echo "Network, user utility, and system files copied."
     echo ""
@@ -263,6 +267,21 @@ EOF
     echo "Systemd services setup complete."
     echo ""
 }
+
+some_extras () {
+    ## Probably won't be functional in Wayland, but try to set up the file manager to not ask options on launch executable file.
+    # Ensure the configuration directory exists
+    mkdir -p /home/pi/.config/pcmanfm/LXDE-pi
+    # Update or create the pcmanfm configuration
+    cat <<EOF > /home/pi/.config/pcmanfm/LXDE-pi/pcmanfm.conf
+    [Desktop]
+    show_warndlg=false
+EOF
+    # Install a ShopBot starter on Desktop
+    install_file "$RESOURCE_DIR/shopbot.desktop" "/home/pi/Desktop/shopbot.desktop"
+}
+
+echo "File manager configuration updated to not ask options on launch executable file."}
 
 # Main installation
 main_installation() {
