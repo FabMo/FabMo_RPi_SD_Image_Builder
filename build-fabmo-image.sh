@@ -260,9 +260,6 @@ EOF
     systemctl enable camera-server-2.service
     systemctl enable export-netcfg-thumbdrive.service
     systemctl enable export-netcfg-thumbdrive.path
-    #systemctl enable dnsmasq
-    #systemctl unmask hostapd
-    #systemctl enable hostapd
 
     echo "Systemd services setup complete."
     echo ""
@@ -277,8 +274,9 @@ some_extras () {
     [Desktop]
     show_warndlg=false
 EOF
-    # Install a ShopBot starter on Desktop
+    # Install a ShopBot starter on Desktop; may work, still needs run setting File Manager to not ask options on launch executable file.
     install_file "$RESOURCE_DIR/shopbot.desktop" "/home/pi/Desktop/shopbot.desktop"
+    install_file "$RESOURCE_DIR/chrome-eoehjepgffkecmikenhncmboihmfijif-Default.desktop" "/home/pi/.local/share/applications/chrome-eoehjepgffkecmikenhncmboihmfijif-Default.desktop"
 }
 
 echo "File manager configuration updated to not ask options on launch executable file."}
@@ -288,14 +286,15 @@ main_installation() {
     echo ""
     echo "BUILDING FabMo SD-Card IMAGE ==========================================================="
     echo ""
-    clean
-    install_packages_and_configure
-    setup_system
-    copy_all_files
-    setup_desktop_environment
-    setup_fabmo
-    cd /home/pi
-    load_and_initialize_systemd_services
+    # clean
+    # install_packages_and_configure
+    # setup_system
+    # copy_all_files
+    # setup_desktop_environment
+    # setup_fabmo
+    # cd /home/pi
+    # load_and_initialize_systemd_services
+    some_extras
     echo "BUILD, Installation, and Configuration Complete. ==============(remove BUILD files?)===="
     echo ""
 }
