@@ -55,6 +55,8 @@ setup_system() {
     raspi-config nonint do_i2c 0
     raspi-config nonint do_ssh 0
     raspi-config nonint do_hostname shopbot
+    raspi-config nonint do_expand_rootfs
+
 
     # Set up node.js
     echo "Installing node.js..."
@@ -178,6 +180,12 @@ setup_fabmo() {
     git clone https://github.com/FabMo/FabMo-Updater.git /fabmo-updater
     cd /fabmo-updater
     npm install
+    // The updater needs to be started twice to create config files and run
+    npm run start
+    // Delay to allow the updater to create the config files
+    sleep 5
+    npm run start
+    
     echo "installed fabmo-updater"
 
     echo "FabMo and Updater done ..."
