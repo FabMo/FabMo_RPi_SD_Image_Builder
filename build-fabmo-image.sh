@@ -160,7 +160,7 @@ setup_desktop_environment() {
     # Copy configuration files  
     cp $RESOURCE_DIR/desktop-items-0.conf /etc/xdg/pcmanfm/LXDE-pi/ 
     cp $RESOURCE_DIR/panel /etc/xdg/lxpanel/LXDE-pi/panels/ 
-    cp $RESOURCE_DIR/chrome-ibibgpobdkbalokofchnpkllnjgfddln-Default.desktop /home/pi/.local/share/applications/ 
+#    cp $RESOURCE_DIR/chrome-ibibgpobdkbalokofchnpkllnjgfddln-Default.desktop /home/pi/.local/share/applications/ 
     cp $RESOURCE_DIR/40-libinput.conf /etc/X11/xorg.conf.d/ 
     echo "Desktop environment set up."
     echo ""
@@ -180,11 +180,11 @@ setup_fabmo() {
     git clone https://github.com/FabMo/FabMo-Updater.git /fabmo-updater
     cd /fabmo-updater
     npm install
-    // The updater needs to be started twice to create config files and run
+    # The updater needs to be started twice to create config files and run
     npm run start
-    // Delay to allow the updater to create the config files
-    sleep 5
-    npm run start
+    # Delay to allow the updater to create the config files
+    sleep 15
+    #npm run start
     
     echo "installed fabmo-updater"
 
@@ -294,14 +294,14 @@ main_installation() {
     echo ""
     echo "BUILDING FabMo SD-Card IMAGE ==========================================================="
     echo ""
-    # clean
-    # install_packages_and_configure
-    # setup_system
-    # copy_all_files
-    # setup_desktop_environment
-    # setup_fabmo
-    # cd /home/pi
-    # load_and_initialize_systemd_services
+    clean
+    install_packages_and_configure
+    setup_system
+    copy_all_files
+    setup_desktop_environment
+    setup_fabmo
+    cd /home/pi
+    load_and_initialize_systemd_services
     some_extras
     echo "BUILD, Installation, and Configuration Complete. ==============(remove BUILD files?)===="
     echo ""
