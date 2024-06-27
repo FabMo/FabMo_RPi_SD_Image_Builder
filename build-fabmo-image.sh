@@ -192,6 +192,55 @@ setup_fabmo() {
     echo ""
 }
 
+# Setup the expand root filesystem service that will expand the root filesystem on first boot of the new SD card
+setup_expand_rootfs() {
+    # Create the expansion script
+    cat <<'EOF' > /usr/share/initramfs-tools/scripts/local-premount/resize.sh
+#!/bin/sh
+
+# Exit if /run/initramfs exists, which means this script has already run.
+[ -d /run/initramfs ] && exit 0
+
+# Log the resize process
+echo "Starting filesystem resize..." > /run/initramfs/fs-resize.log
+
+# Resize the partition
+(
+echo p # Print the partition table
+echo d # Delete the second partition
+echo 2 # Partition number 2
+echo n # Create a new partition
+echo p # Primary partition
+echo 2 # Partition number 2
+echo   # Default - start at beginning of partition
+echo   # Default - extend partition to end of disk
+echo p # Print the partition table
+echo w # Write the partition table
+) | fdisk /dev/mmcblk0 >> /run/initramfs/fs-resize.log 2>&1
+
+# Refresh the partition table
+partprobe /dev/mmcblk0 >> /run/initramfs/fs-resize.log 2>&1
+
+# Resize the filesystem
+resize2fs /dev/mmcblk0p2 >> /run/initramfs/fs-resize.log 2>&1
+
+# Log completion
+echo "Filesystem resize complete." >> /run/initramfs/fs-resize.log
+
+# Create a flag file to indicate the resize has been done
+touch /run/initramfs/resize-done
+
+# Reboot the system
+reboot
+EOF
+
+    # Make the script executable
+    sudo chmod +x /usr/share/initramfs-tools/scripts/local-premount/resize.sh
+
+    # Update initramfs
+    sudo update-initramfs -u
+}
+
 # SystemD
 load_and_initialize_systemd_services() {
     echo "Setting up systemd services..."
@@ -302,6 +351,7 @@ main_installation() {
     setup_fabmo
     cd /home/pi
     load_and_initialize_systemd_services
+    setup_expand_rootfs
     some_extras
     echo "BUILD, Installation, and Configuration Complete. ==============(remove BUILD files?)===="
     echo ""
