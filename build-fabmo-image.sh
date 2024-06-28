@@ -85,6 +85,10 @@ setup_system() {
         sed -i '1 s/$/ splash/' /boot/firmware/cmdline.txt
     fi
 
+    if ! grep -q "init=/usr/lib/raspberrypi-sys-mods/firstboot" /boot/firmware/cmdline.txt; then
+        sed -i'' -e '1 s/$/ init=\/usr\/lib\/raspberrypi-sys-mods\/firstboot/' /boot/firmware/cmdline.txt
+    fi
+
     echo "System Configurations set."
     echo ""
 }
@@ -194,15 +198,20 @@ setup_fabmo() {
 
 # Setup the expand root filesystem service that will expand the root filesystem on first boot of the new SD card
 setup_expand_rootfs() {
-    # Create the expansion script
-    cat <<'EOF' > /usr/share/initramfs-tools/scripts/local-premount/resize.sh
+sudo tee /usr/share/initramfs-tools/scripts/local-premount/resize.sh > /dev/null <<'EOF'
 #!/bin/sh
 
-# Exit if /run/initramfs exists, which means this script has already run.
-[ -d /run/initramfs ] && exit 0
+# Path to the flag file
+FLAG_FILE="/var/run/resize-done"
+
+# Check if the filesystem has already been expanded
+if [ -f "$FLAG_FILE" ]; then
+  echo "Filesystem already expanded, exiting..."
+  exit 0
+fi
 
 # Log the resize process
-echo "Starting filesystem resize..." > /run/initramfs/fs-resize.log
+echo "Starting filesystem resize..." > /tmp/fs-resize.log
 
 # Resize the partition
 (
@@ -216,19 +225,19 @@ echo   # Default - start at beginning of partition
 echo   # Default - extend partition to end of disk
 echo p # Print the partition table
 echo w # Write the partition table
-) | fdisk /dev/mmcblk0 >> /run/initramfs/fs-resize.log 2>&1
+) | fdisk /dev/mmcblk0 >> /tmp/fs-resize.log 2>&1
 
 # Refresh the partition table
-partprobe /dev/mmcblk0 >> /run/initramfs/fs-resize.log 2>&1
+partprobe /dev/mmcblk0 >> /tmp/fs-resize.log 2>&1
 
 # Resize the filesystem
-resize2fs /dev/mmcblk0p2 >> /run/initramfs/fs-resize.log 2>&1
+resize2fs /dev/mmcblk0p2 >> /tmp/fs-resize.log 2>&1
 
 # Log completion
-echo "Filesystem resize complete." >> /run/initramfs/fs-resize.log
+echo "Filesystem resize complete." >> /tmp/fs-resize.log
 
 # Create a flag file to indicate the resize has been done
-touch /run/initramfs/resize-done
+touch "$FLAG_FILE"
 
 # Reboot the system
 reboot
@@ -240,6 +249,7 @@ EOF
     # Update initramfs
     sudo update-initramfs -u
 }
+
 
 # SystemD
 load_and_initialize_systemd_services() {
