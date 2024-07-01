@@ -55,7 +55,7 @@ setup_system() {
     raspi-config nonint do_i2c 0
     raspi-config nonint do_ssh 0
     raspi-config nonint do_hostname shopbot
-    raspi-config nonint do_expand_rootfs
+    #raspi-config nonint do_expand_rootfs
 
 
     # Set up node.js
@@ -85,6 +85,7 @@ setup_system() {
         sed -i '1 s/$/ splash/' /boot/firmware/cmdline.txt
     fi
 
+    # to get the firstboot expansion to run on the next boot; also a line in the config.txt for this
     if ! grep -q "init=/usr/lib/raspberrypi-sys-mods/firstboot" /boot/firmware/cmdline.txt; then
         sed -i'' -e '1 s/$/ init=\/usr\/lib\/raspberrypi-sys-mods\/firstboot/' /boot/firmware/cmdline.txt
     fi
@@ -164,7 +165,6 @@ setup_desktop_environment() {
     # Copy configuration files  
     cp $RESOURCE_DIR/desktop-items-0.conf /etc/xdg/pcmanfm/LXDE-pi/ 
     cp $RESOURCE_DIR/panel /etc/xdg/lxpanel/LXDE-pi/panels/ 
-#    cp $RESOURCE_DIR/chrome-ibibgpobdkbalokofchnpkllnjgfddln-Default.desktop /home/pi/.local/share/applications/ 
     cp $RESOURCE_DIR/40-libinput.conf /etc/X11/xorg.conf.d/ 
     echo "Desktop environment set up."
     echo ""
@@ -196,59 +196,59 @@ setup_fabmo() {
     echo ""
 }
 
-# Setup the expand root filesystem service that will expand the root filesystem on first boot of the new SD card
-setup_expand_rootfs() {
-sudo tee /usr/share/initramfs-tools/scripts/local-premount/resize.sh > /dev/null <<'EOF'
-#!/bin/sh
+# # Setup the expand root filesystem service that will expand the root filesystem on first boot of the new SD card
+# setup_expand_rootfs() {
+# sudo tee /usr/share/initramfs-tools/scripts/local-premount/resize.sh > /dev/null <<'EOF'
+# #!/bin/sh
 
-# Path to the flag file
-FLAG_FILE="/var/run/resize-done"
+# # Path to the flag file
+# FLAG_FILE="/var/run/resize-done"
 
-# Check if the filesystem has already been expanded
-if [ -f "$FLAG_FILE" ]; then
-  echo "Filesystem already expanded, exiting..."
-  exit 0
-fi
+# # Check if the filesystem has already been expanded
+# if [ -f "$FLAG_FILE" ]; then
+#   echo "Filesystem already expanded, exiting..."
+#   exit 0
+# fi
 
-# Log the resize process
-echo "Starting filesystem resize..." > /tmp/fs-resize.log
+# # Log the resize process
+# echo "Starting filesystem resize..." > /tmp/fs-resize.log
 
-# Resize the partition
-(
-echo p # Print the partition table
-echo d # Delete the second partition
-echo 2 # Partition number 2
-echo n # Create a new partition
-echo p # Primary partition
-echo 2 # Partition number 2
-echo   # Default - start at beginning of partition
-echo   # Default - extend partition to end of disk
-echo p # Print the partition table
-echo w # Write the partition table
-) | fdisk /dev/mmcblk0 >> /tmp/fs-resize.log 2>&1
+# # Resize the partition
+# (
+# echo p # Print the partition table
+# echo d # Delete the second partition
+# echo 2 # Partition number 2
+# echo n # Create a new partition
+# echo p # Primary partition
+# echo 2 # Partition number 2
+# echo   # Default - start at beginning of partition
+# echo   # Default - extend partition to end of disk
+# echo p # Print the partition table
+# echo w # Write the partition table
+# ) | fdisk /dev/mmcblk0 >> /tmp/fs-resize.log 2>&1
 
-# Refresh the partition table
-partprobe /dev/mmcblk0 >> /tmp/fs-resize.log 2>&1
+# # Refresh the partition table
+# partprobe /dev/mmcblk0 >> /tmp/fs-resize.log 2>&1
 
-# Resize the filesystem
-resize2fs /dev/mmcblk0p2 >> /tmp/fs-resize.log 2>&1
+# # Resize the filesystem
+# resize2fs /dev/mmcblk0p2 >> /tmp/fs-resize.log 2>&1
 
-# Log completion
-echo "Filesystem resize complete." >> /tmp/fs-resize.log
+# # Log completion
+# echo "Filesystem resize complete." >> /tmp/fs-resize.log
 
-# Create a flag file to indicate the resize has been done
-touch "$FLAG_FILE"
+# # Create a flag file to indicate the resize has been done
+# touch "$FLAG_FILE"
 
-# Reboot the system
-reboot
-EOF
+# # Reboot the system
+# reboot
+# EOF
 
-    # Make the script executable
-    sudo chmod +x /usr/share/initramfs-tools/scripts/local-premount/resize.sh
+#     # Make the script executable
+#     sudo chmod +x /usr/share/initramfs-tools/scripts/local-premount/resize.sh
 
-    # Update initramfs
-    sudo update-initramfs -u
-}
+#     # Update initramfs
+#     sudo update-initramfs -u
+# }
 
 
 # SystemD
@@ -333,14 +333,6 @@ EOF
 }
 
 some_extras () {
-    ## Probably won't be functional in Wayland, but try to set up the file manager to not ask options on launch executable file.
-    # Ensure the configuration directory exists
-    mkdir -p /home/pi/.config/pcmanfm/LXDE-pi
-    # Update or create the pcmanfm configuration
-    cat <<EOF > /home/pi/.config/pcmanfm/LXDE-pi/pcmanfm.conf
-    [Desktop]
-    show_warndlg=false
-EOF
     # Install a ShopBot starter on Desktop; may work, still needs run setting File Manager to not ask options on launch executable file.
     install_file "$RESOURCE_DIR/shopbot.desktop" "/home/pi/Desktop/shopbot.desktop"
     install_file "$RESOURCE_DIR/chrome-eoehjepgffkecmikenhncmboihmfijif-Default.desktop" "/home/pi/.local/share/applications/chrome-eoehjepgffkecmikenhncmboihmfijif-Default.desktop"
@@ -360,7 +352,7 @@ main_installation() {
     setup_fabmo
     cd /home/pi
     load_and_initialize_systemd_services
-    setup_expand_rootfs
+    #setup_expand_rootfs
     some_extras
     echo "BUILD, Installation, and Configuration Complete. ==============(remove BUILD files?)===="
     echo ""
