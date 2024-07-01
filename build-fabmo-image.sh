@@ -300,11 +300,14 @@ main_installation() {
     #setup_expand_rootfs
     some_extras
     echo "BUILD, Installation, and Configuration Complete. ==============(remove BUILD files?)===="
-    echo "MANUAL STEPS REQUIRED:"
+    echo ""
+    echo "MANUAL STEPS NOW REQUIRED:"
     echo "-Check to make sure expansion call is in cmdline.txt; last line should have init=/usr/lib/raspberrypi-sys-mods/firstboot"
     echo "-Enable running from desktop in FileManager Prefs."
     echo "-Set color for virtual keyboard in onboard."
     echo "-? Set up rotation for small screen."
+    echo "-**STILL have not gotten Chrome config to save right; need to check that."
+    echo ""
     echo ""
     echo ""
     echo ""
