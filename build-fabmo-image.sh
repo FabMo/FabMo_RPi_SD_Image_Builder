@@ -38,7 +38,7 @@ install_packages_and_configure() {
     wait_for_dpkg_lock
     echo "Updating package lists..."
     apt-get update
-    apt-get install -y bossa-cli hostapd dnsmasq onboard xserver-xorg-input-libinput pi-package jackd2
+    apt-get install -y bossa-cli hostapd dnsmasq onboard xserver-xorg-input-libinput pi-package jackd2 python3-pyudev python3-tornado
     # Preconfigure jackd2 (audio) to allow real-time process priority
     debconf-set-selections <<< "jackd2 jackd/tweak_rt_limits boolean true"
     echo "Packages installed."
@@ -346,7 +346,6 @@ EOF
     install_file "$RESOURCE_DIR/chrome-eoehjepgffkecmikenhncmboihmfijif-Default.desktop" "/home/pi/.local/share/applications/chrome-eoehjepgffkecmikenhncmboihmfijif-Default.desktop"
 }
 
-echo "File manager configuration updated to not ask options on launch executable file."}
 
 # Main installation
 main_installation() {

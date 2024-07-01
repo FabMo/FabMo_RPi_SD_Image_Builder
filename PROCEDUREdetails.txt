@@ -13,7 +13,7 @@ PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy wi
 	- this takes a while because it --brings in all the latest updates--
     - enable SSH so you can muck around 
 4. Shut down the RPi, remove this card, and bring the card back to PC.
-5. Use Win32Disk Imager to make the new "Working-OS-Image" SAVE THIS ==MASTER== FOR UPDATES ! (probably no need to change for months)
+5. Use Win32Disk Imager to make the new "Working-OS-Image" SAVE THIS ==MASTER== FOR UPDATES ! (probably no need to change for months; this itself could be updated before a major release)
 
 
 PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Image)
@@ -30,7 +30,7 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
 	sudo ./build-fabmo-image.sh
 
 10. WHEN the script is finished running, check to make sure things got installed and permissions look right.
-11. Reboot this card as a test. Hopefully everything comes up looking as it should and ethernet cable switching works?
+11. DO NOT Reboot this card as a test, if you want to make a smaller version as it seems to expand for the last time on the reboot (see cmd.txt init=)! 
 12. Make a copy of this SD card to a smaller SD card; typically 16G; but 8G seems to work at the moment.
       	(It can also be copied from this RPi for quick working copies.)
 13. This SD card can now be used with the Win32Disk Imager to make our NEW FabMo-RPi-Image
