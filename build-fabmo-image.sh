@@ -196,61 +196,6 @@ setup_fabmo() {
     echo ""
 }
 
-# # Setup the expand root filesystem service that will expand the root filesystem on first boot of the new SD card
-# setup_expand_rootfs() {
-# sudo tee /usr/share/initramfs-tools/scripts/local-premount/resize.sh > /dev/null <<'EOF'
-# #!/bin/sh
-
-# # Path to the flag file
-# FLAG_FILE="/var/run/resize-done"
-
-# # Check if the filesystem has already been expanded
-# if [ -f "$FLAG_FILE" ]; then
-#   echo "Filesystem already expanded, exiting..."
-#   exit 0
-# fi
-
-# # Log the resize process
-# echo "Starting filesystem resize..." > /tmp/fs-resize.log
-
-# # Resize the partition
-# (
-# echo p # Print the partition table
-# echo d # Delete the second partition
-# echo 2 # Partition number 2
-# echo n # Create a new partition
-# echo p # Primary partition
-# echo 2 # Partition number 2
-# echo   # Default - start at beginning of partition
-# echo   # Default - extend partition to end of disk
-# echo p # Print the partition table
-# echo w # Write the partition table
-# ) | fdisk /dev/mmcblk0 >> /tmp/fs-resize.log 2>&1
-
-# # Refresh the partition table
-# partprobe /dev/mmcblk0 >> /tmp/fs-resize.log 2>&1
-
-# # Resize the filesystem
-# resize2fs /dev/mmcblk0p2 >> /tmp/fs-resize.log 2>&1
-
-# # Log completion
-# echo "Filesystem resize complete." >> /tmp/fs-resize.log
-
-# # Create a flag file to indicate the resize has been done
-# touch "$FLAG_FILE"
-
-# # Reboot the system
-# reboot
-# EOF
-
-#     # Make the script executable
-#     sudo chmod +x /usr/share/initramfs-tools/scripts/local-premount/resize.sh
-
-#     # Update initramfs
-#     sudo update-initramfs -u
-# }
-
-
 # SystemD
 load_and_initialize_systemd_services() {
     echo "Setting up systemd services..."
@@ -355,6 +300,13 @@ main_installation() {
     #setup_expand_rootfs
     some_extras
     echo "BUILD, Installation, and Configuration Complete. ==============(remove BUILD files?)===="
+    echo "MANUAL STEPS REQUIRED:"
+    echo "-Check to make sure expansion call is in cmdline.txt; last line should have init=/usr/lib/raspberrypi-sys-mods/firstboot"
+    echo "-Enable running from desktop in FileManager Prefs."
+    echo "-Set color for virtual keyboard in onboard."
+    echo "-? Set up rotation for small screen."
+    echo ""
+    echo ""
     echo ""
 }
 
