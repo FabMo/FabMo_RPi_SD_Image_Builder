@@ -217,6 +217,7 @@ load_and_initialize_systemd_services() {
             echo "Source file /fabmo/files/$SERVICE does not exist"
         fi
     done    
+    
     echo "Creating systemd sym-links from fabmo/files/network_conf_fabmo ..."
     SERVICES=("network-monitor.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
     for SERVICE in "${SERVICES[@]}"; do
@@ -230,7 +231,13 @@ load_and_initialize_systemd_services() {
         else
             echo "Source file /fabmo/files/network_conf_fabmo/$SERVICE does not exist"
         fi
-    done    
+    done
+    
+    echo "Copy the recent_wifi.json from resources/network_conf_fabmo to /etc/network_conf_fabmo" after creating the directory ..." 
+    mkdir -p /etc/network_conf_fabmo
+    install_file "$RESOURCE_DIR/network_conf_fabmo/recent_wifi.json" "/etc/network_conf_fabmo/recent_wifi.json"
+    echo "... done created /etc/network_conf_fabmo/recent_wifi.json"
+
     echo "Creating systemd sym-links from fabmo-updater ..."
     SERVICES=("fabmo-updater.service")
     for SERVICE in "${SERVICES[@]}"; do
