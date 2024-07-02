@@ -52,7 +52,23 @@ Some details:
                      export-netcfg-thumbdrive.path
                /fabmo-updater/files:
                    fabmo-updater.service
+               /usr/local/bin
+                   ck_heat_volts.sh
+                   ck_network.sh
+                   ck_services.sh
+                   setup_wlan0_ap.sh     *move to networking area?
+               /sysd-services
+                   hostapd.service
+                   setup-wlan0_ap.service
+               /NetworkManager
+                   /system-connections
+                       /system-connections 
+                           direct-connection 
+                           lan-connection
+                           wlan0_ap.nmconnection 
+                       NetworkManager.conf    
+
 
     *this LIST is INCOMPLETE ! finish ... 
-    *note to maybe put modify-priorities in the build script   
+    *Note that modify-priorities and set-network-priorities are not being used from this point  
 
