@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Needed to make sure we are using the wlan0 transmitter with NetworkManager ???
 # Create the AP interface if it doesn't exist
 if ! iw dev | grep -q wlan0_ap; then
     iw dev wlan0 interface add wlan0_ap type __ap
