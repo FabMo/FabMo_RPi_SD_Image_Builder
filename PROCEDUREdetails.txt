@@ -7,11 +7,15 @@ PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy wi
 ** Maybe REPLACE 1 and 2 by doing the imaging on the Pi itself?? **
 ** Check out the new "sdm" system to improve precustomization of this system and potentially get smaller zipped image for shipping **
 1. Download image from Raspi Foundation to PC [Current 64bit Desktop (w/o recommended software) Image] and save to a "build" folder.
+    > NOW USING LITE VERSION TO GET ON 8G
 2. Use this image to create an initial SD-card using Balena Etcher.
 3. Run this card once on a Raspberry Pi:
 	- hook up a keyboard/mouse and follow the start-up sequence .... {{details}}
 	- this takes a while because it --brings in all the latest updates--
-    - enable SSH so you can muck around 
+    - enable SSH
+    - make dir   /home/pi/Scripts 
+    - fix file running from File Manager 
+    - install rpi-connect, may not be included in lite version
 4. Shut down the RPi, remove this card, and bring the card back to PC.
 5. Use Win32Disk Imager to make the new "Working-OS-Image" SAVE THIS ==MASTER== FOR UPDATES ! (probably no need to change for months; this itself could be updated before a major release)
 
@@ -21,18 +25,17 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
 7. Boot up this card up on a Raspberry Pi:
     - Go to Preferences > RPi COnfiguration > Interfaces > and turn SSH on if it is not
 8. THEN DO:
-    sudo mkdir /home/pi/Scripts
+    Into: /home/pi/Scripts
     [copy into this new folder (you can use WinSCP logged on as pi) from "FabMo_RPi_SD_Image_Builder" current local repo]:
       	build-fabmo-image.sh
 	    resources [folder]
 9. NEXT DO: 
-	cd /home/pi/Scripts  
-	sudo ./build-fabmo-image.sh
+	From Terminal:  cd /home/pi/Scripts  
+	                sudo ./build-fabmo-image.sh
 
 10. WHEN the script is finished running, check to make sure things got installed and permissions look right.
-11. DO NOT Reboot this card as a test, if you want to make a smaller version as it seems to expand for the last time on the reboot (see cmd.txt init=)! 
-12. Make a copy of this SD card to a smaller SD card; typically 16G; but 8G seems to work at the moment.
-      	(It can also be copied from this RPi for quick working copies.)
+11. DO NOT Reboot this card as a test if you want to make a small version as it seems to expand for the last time on the reboot (see cmd.txt init=)! 
+12. Make a copy of this SD card to a smaller SD card; 8G seems to work at the moment.
 13. This SD card can now be used with the Win32Disk Imager to make our NEW FabMo-RPi-Image
 14. Make a Zipped Copy of the NEW FabMo-RPi-Image for distribution.
 
