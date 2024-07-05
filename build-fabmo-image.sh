@@ -109,7 +109,7 @@ copy_all_files() {
     mkdir -p /etc/hostapd
     install_file "$RESOURCE_DIR/hostapd/hostapd.conf" "/etc/hostapd/hostapd.conf"
     # install hostapd service file
-    install_file "$RESOURCE_DIR/sysd-services/hostapd.service" "/lib/systemd/system/hostapd.service"
+    install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/hostapd.service" "/lib/systemd/system/hostapd.service"
     # Create the directory for hostapd PID file
     mkdir -p /run/hostapd
     chown root:root /run/hostapd
@@ -119,7 +119,7 @@ copy_all_files() {
     systemctl enable hostapd
     
     # Install hostapd service file, shell file now in network_conf_fabmo
-    install_file "$RESOURCE_DIR/sysd-services/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
+    install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
 
     # Key dnsmasq configuration file (will not be updated with fabmo update)
     install_file "$RESOURCE_DIR/dnsmasq/dnsmasq.conf" "/etc/dnsmasq.conf"
@@ -139,6 +139,7 @@ copy_all_files() {
 
     # Key USB symlink file for FabMo and VFD
     install_file "$RESOURCE_DIR/99-fabmo-usb.rules" "/etc/udev/rules.d/"
+    chmod 644 /etc/udev/rules.d/99-fabmo-usb.rules
 
     # Boot and User Interface Resources
     install_file "$RESOURCE_DIR/FabMo-Icon-03-left.png" "/usr/share/plymouth/themes/pix/splash.png"
