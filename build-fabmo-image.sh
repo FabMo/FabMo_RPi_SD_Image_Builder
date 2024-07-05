@@ -2,6 +2,7 @@
 
 # Variables
 RESOURCE_DIR="/home/pi/Scripts/resources"
+FABMO_RESOURCE_DIR="/fabmo/files"
 
 # Clean any existing install
 clean() {
@@ -85,7 +86,7 @@ setup_system() {
         sed -i '1 s/$/ splash/' /boot/firmware/cmdline.txt
     fi
 
-    # to get the firstboot expansion to run on the next boot; also a line in the config.txt for this
+    # to get the firstboot expansion to run on the next boot; also a line in the config.txt for this that must be in place
     if ! grep -q "init=/usr/lib/raspberrypi-sys-mods/firstboot" /boot/firmware/cmdline.txt; then
         sed -i'' -e '1 s/$/ init=\/usr\/lib\/raspberrypi-sys-mods\/firstboot/' /boot/firmware/cmdline.txt
     fi
@@ -97,13 +98,14 @@ setup_system() {
 # Copy all network, user utility, and system files
 copy_all_files() {
     echo "Copying network, user utility, and system files..."
-    # NetworkManager Configurations
+    # NetworkManager Configurations (will not be updated with fabmo update)
     install_file "$RESOURCE_DIR/NetworkManager/NetworkManager.conf" "/etc/NetworkManager/NetworkManager.conf"
-    # NetworkManager system-connections
+    # NetworkManager system-connections (will not be updated with fabmo update)
     copy_files "$RESOURCE_DIR/NetworkManager/system-connections" "/etc/NetworkManager/system-connections"
     # NetworkManager make sure we have the right permissions on these files, they are sensitive
     chmod 600 /etc/NetworkManager/system-connections/*
-    # hostapd configuration file
+    
+    # hostapd configuration file (will not be updated with fabmo update)
     mkdir -p /etc/hostapd
     install_file "$RESOURCE_DIR/hostapd/hostapd.conf" "/etc/hostapd/hostapd.conf"
     # install hostapd service file
@@ -115,21 +117,27 @@ copy_all_files() {
     systemctl unmask hostapd
     systemctl daemon-reload
     systemctl enable hostapd
-    # Key dnsmasq configuration file
+    
+    # Install hostapd service file, shell file now in network_conf_fabmo
+    install_file "$RESOURCE_DIR/sysd-services/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
+
+    # # Network Monitoring and IP Display Utilities for FabMo along with some usable diagnostic scripts
+    # mkdir -p /usr/local/bin
+    # copy_files "$RESOURCE_DIR/usr-local-bin" "/usr/local/bin"
+    # # Make sure we have the right permissions on these files, they are sensitive
+    # chmod 755 /usr/local/bin/*
+    # systemctl daemon-reload
+
+    # Key dnsmasq configuration file (will not be updated with fabmo update)
     install_file "$RESOURCE_DIR/dnsmasq/dnsmasq.conf" "/etc/dnsmasq.conf"
     # Make sure we have the right permissions on this file, it is sensitive
     chmod 755 /etc/dnsmasq.conf
-    systemctl enable dnsmasq
-    # install hostapd service file
-    install_file "$RESOURCE_DIR/sysd-services/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
 
-    # Network Monitoring and IP Display Utilities for FabMo along with some usable diagnostic scripts
-    mkdir -p /usr/local/bin
-    copy_files "$RESOURCE_DIR/usr-local-bin" "/usr/local/bin"
-    # Make sure we have the right permissions on these files, they are sensitive
-    chmod 755 /usr/local/bin/*
+    # enabled them
     systemctl daemon-reload
     systemctl enable setup-wlan0_ap
+    systemctl enable dnsmasq
+
 
     # User Utilities
     mkdir -p /home/pi/Scripts
@@ -170,7 +178,8 @@ setup_desktop_environment() {
     echo ""
 }
 
-# Setup FabMo
+# Setup FabMo // Note that many resource files are in the fabmo/files directory; so this needs to be installed before copying
+# ... this is partly done to keep changes in the fabmo update rather than the image and to prevent changes to permissions from copying between systems
 setup_fabmo() {
     echo "cloning fabmo-engine"
     git clone https://github.com/FabMo/FabMo-Engine.git /fabmo
@@ -196,12 +205,28 @@ setup_fabmo() {
     echo ""
 }
 
+# Move files from fabmo/files to the correct locations and set permissions 
+# ... this is done to keep changes in the fabmo update rather than the image and to prevent changes to permissions from copying between systems 
+# ... this is done after fabmo is installed to prevent changes to the fabmo update from being copied to the image
+
+
+    
+
+# Create Sym-links for External FabMo Tools services
+make_misc_tool_symlinks () {
+    sudo ln -s $FABMO_RESOURCE_DIR/tools/ck_heat_volts.sh /usr/local/bin/ck_heat_volts
+    sudo ln -s $FABMO_RESOURCE_DIR/tools/ck_heat_volts.sh /usr/local/bin/ck_heat_volts
+    sudo ln -s $FABMO_RESOURCE_DIR/tools/ck_heat_volts.sh /usr/local/bin/ck_heat_volts
+
+}
+
 # SystemD
 load_and_initialize_systemd_services() {
     echo "Setting up systemd services..."
 
     # FabMo and Updater SystemD Service symlinks to files
     cd /etc/systemd/system
+
     echo "Creating systemd sym-links from fabmo/files ..."
     SERVICES=("fabmo.service" "camera-server-1.service" "camera-server-2.service")
     # Loop through the services and create symlinks
@@ -233,7 +258,7 @@ load_and_initialize_systemd_services() {
         fi
     done
     
-    echo "Copy the recent_wifi.json from resources/network_conf_fabmo to /etc/network_conf_fabmo" after creating the directory ..." 
+    echo "Copy the recent_wifi.json from resources/network_conf_fabmo to /etc/network_conf_fabmo" 
     mkdir -p /etc/network_conf_fabmo
     install_file "$RESOURCE_DIR/network_conf_fabmo/recent_wifi.json" "/etc/network_conf_fabmo/recent_wifi.json"
     echo "... done created /etc/network_conf_fabmo/recent_wifi.json"

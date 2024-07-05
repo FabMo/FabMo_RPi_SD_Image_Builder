@@ -5,7 +5,7 @@ After=network.target setup-wlan0_ap.service
 
 [Service]
 ExecStart=/usr/sbin/hostapd -P /run/hostapd/hostapd.pid /etc/hostapd/hostapd.conf
-ExecReload=/bin/kill -HUP \$MAINPID
+ExecReload=/bin/kill -HUP
 PIDFile=/run/hostapd/hostapd.pid
 
 [Install]
