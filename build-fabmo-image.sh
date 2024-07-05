@@ -121,13 +121,6 @@ copy_all_files() {
     # Install hostapd service file, shell file now in network_conf_fabmo
     install_file "$RESOURCE_DIR/sysd-services/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
 
-    # # Network Monitoring and IP Display Utilities for FabMo along with some usable diagnostic scripts
-    # mkdir -p /usr/local/bin
-    # copy_files "$RESOURCE_DIR/usr-local-bin" "/usr/local/bin"
-    # # Make sure we have the right permissions on these files, they are sensitive
-    # chmod 755 /usr/local/bin/*
-    # systemctl daemon-reload
-
     # Key dnsmasq configuration file (will not be updated with fabmo update)
     install_file "$RESOURCE_DIR/dnsmasq/dnsmasq.conf" "/etc/dnsmasq.conf"
     # Make sure we have the right permissions on this file, it is sensitive
@@ -214,10 +207,9 @@ setup_fabmo() {
 
 # Create Sym-links for External FabMo Tools services
 make_misc_tool_symlinks () {
-    sudo ln -s $FABMO_RESOURCE_DIR/tools/ck_heat_volts.sh /usr/local/bin/ck_heat_volts
-    sudo ln -s $FABMO_RESOURCE_DIR/tools/ck_heat_volts.sh /usr/local/bin/ck_heat_volts
-    sudo ln -s $FABMO_RESOURCE_DIR/tools/ck_heat_volts.sh /usr/local/bin/ck_heat_volts
-
+    sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_heat_volts.sh /usr/local/bin/ck_heat_volts
+    sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_network.sh /usr/local/bin/ck_network
+    sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_services.sh /usr/local/bin/ck_services
 }
 
 # SystemD
@@ -329,8 +321,10 @@ main_installation() {
     setup_fabmo
     cd /home/pi
     load_and_initialize_systemd_services
-    #setup_expand_rootfs
+    make_misc_tool_symlinks 
     some_extras
+
+
     echo "BUILD, Installation, and Configuration Complete. ==============(remove BUILD files?)===="
     echo ""
     echo "MANUAL STEPS NOW REQUIRED:"
