@@ -56,8 +56,6 @@ setup_system() {
     raspi-config nonint do_i2c 0
     raspi-config nonint do_ssh 0
     raspi-config nonint do_hostname shopbot
-    #raspi-config nonint do_expand_rootfs
-
 
     # Set up node.js
     echo "Installing node.js..."
@@ -108,29 +106,6 @@ copy_all_files() {
     # hostapd configuration file (will not be updated with fabmo update)
     mkdir -p /etc/hostapd
     install_file "$RESOURCE_DIR/hostapd/hostapd.conf" "/etc/hostapd/hostapd.conf"
-    # install hostapd service file
-    install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/hostapd.service" "/lib/systemd/system/hostapd.service"
-    # Create the directory for hostapd PID file
-    mkdir -p /run/hostapd
-    chown root:root /run/hostapd
-    chmod 755 /run/hostapd
-    systemctl unmask hostapd
-    systemctl daemon-reload
-    systemctl enable hostapd
-    
-    # Install hostapd service file, shell file now in network_conf_fabmo
-    install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
-
-    # Key dnsmasq configuration file (will not be updated with fabmo update)
-    install_file "$RESOURCE_DIR/dnsmasq/dnsmasq.conf" "/etc/dnsmasq.conf"
-    # Make sure we have the right permissions on this file, it is sensitive
-    chmod 755 /etc/dnsmasq.conf
-
-    # enabled them
-    systemctl daemon-reload
-    systemctl enable setup-wlan0_ap
-    systemctl enable dnsmasq
-
 
     # User Utilities
     mkdir -p /home/pi/Scripts
@@ -200,14 +175,34 @@ setup_fabmo() {
 }
 
 # Move files from fabmo/files to the correct locations and set permissions 
-# ... this is done to keep changes in the fabmo update rather than the image and to prevent changes to permissions from copying between systems 
+# ... this is done to keep changes in the fabmo update rather than the image 
 # ... this is done after fabmo is installed to prevent changes to the fabmo update from being copied to the image
-
-
+# install hostapd service file and other symlinks
+make_misc_tool_symlinks () {
+    install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/hostapd.service" "/lib/systemd/system/hostapd.service"
+    chmod -x /lib/systemd/system/hostapd.service
+    # Create the directory for hostapd PID file
+    mkdir -p /run/hostapd
+    chown root:root /run/hostapd
+    chmod 755 /run/hostapd
+    systemctl unmask hostapd
+    systemctl daemon-reload
+    systemctl enable hostapd
     
+    # Install setup-wlan0_ap service file, shell file now in network_conf_fabmo
+    install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
+
+    # Key dnsmasq configuration file (will not be updated with fabmo update)
+    install_file "$RESOURCE_DIR/dnsmasq/dnsmasq.conf" "/etc/dnsmasq.conf"
+    # Make sure we have the right permissions on this file, it is sensitive
+    chmod 755 /etc/dnsmasq.conf
+
+    # enabled them
+    systemctl daemon-reload
+    systemctl enable setup-wlan0_ap
+    systemctl enable dnsmasq
 
 # Create Sym-links for External FabMo Tools services
-make_misc_tool_symlinks () {
     sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_heat_volts.sh /usr/local/bin/ck_heat_volts
     sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_network.sh /usr/local/bin/ck_network
     sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_services.sh /usr/local/bin/ck_services
@@ -280,13 +275,21 @@ load_and_initialize_systemd_services() {
 EOF
     # Install autostart for ip-reporting, method should work for generic user in bookworm 
     install_file "/fabmo/files/network_conf_fabmo/fabmo-ip-reporting.desktop" "/etc/xdg/autostart/fabmo-ip-reporting.desktop"
+    chmod -x /etc/xdg/autostart/fabmo-ip-reporting.desktop
     
-    # Make sure files in /fabmo/files are executable
-    chmod +x /fabmo/files/*
-    # Make sure files in /fabmo-updater/files are executable
-    chmod +x /fabmo-updater/files/*
-    # Make sure files in /fabmo/files/network_conf_fabmo are executable
-    chmod +x /fabmo/files/network_conf_fabmo/*    
+    # Make sure that all files in /fabmo/files and subdirectories that end in .service or .path are not executable
+    find /fabmo/files -type f -name "*.service" -exec chmod -x {} \;
+    find /fabmo-updater/files -type f -name "*.service" -exec chmod -x {} \;
+    find /fabmo/files/network_conf_fabmo -type f -name "*.service" -exec chmod -x {} \;
+    find /fabmo/files/network_conf_fabmo -type f -name "*.path" -exec chmod -x {} \;
+
+     # Make sure that all files in /fabmo/files and subdirectories that end in .sh or .py are executable
+    find /fabmo/files -type f -name "*.sh" -exec chmod +x {} \;
+    find /fabmo/files/network_conf_fabmo -type f -name "*.sh" -exec chmod +x {} \;
+    find /fabmo/files/tools -type f -name "*.sh" -exec chmod +x {} \;
+    find /fabmo/files -type f -name "*.py" -exec chmod +x {} \;
+    find /fabmo/files/network_conf_fabmo -type f -name "*.py" -exec chmod +x {} \;
+    find /fabmo/files/tools -type f -name "*.py" -exec chmod +x {} \;
 
     echo "Enabling systemd services..."
     systemctl daemon-reload
