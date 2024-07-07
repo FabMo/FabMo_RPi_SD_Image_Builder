@@ -39,7 +39,7 @@ install_packages_and_configure() {
     wait_for_dpkg_lock
     echo "Updating package lists..."
     apt-get update
-    apt-get install -y bossa-cli hostapd dnsmasq onboard xserver-xorg-input-libinput pi-package jackd2 python3-pyudev python3-tornado
+    apt-get install -y bossa-cli hostapd dnsmasq xserver-xorg-input-libinput pi-package jackd2 python3-pyudev python3-tornado wvkbd
     # Preconfigure jackd2 (audio) to allow real-time process priority
     debconf-set-selections <<< "jackd2 jackd/tweak_rt_limits boolean true"
     echo "Packages installed."
@@ -128,6 +128,12 @@ copy_all_files() {
 
     # Install the wf-panel-pi.ini to get some panel items in the menu
     install_file "$RESOURCE_DIR/wf-panel-pi.ini" "/home/pi/.config/wf-panel-pi.ini"
+
+    # New virtual keyboard for Bookworm and toggling it on and off
+    install_file "$RESOURCE_DIR/togle-wvkbd.sh" "/usr/bin/toggle-wvkbd.sh"
+    install_file "$RESOURCE_DIR/wvkbd.desktop" "/usr/bin//wvkbd.desktop"
+    chmod +x /usr/bin/toggle-wvkbd.sh
+    chmod +x /usr/bin/wvkbd.desktop
 
     echo "Network, user utility, and system files copied."
     echo ""

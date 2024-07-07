@@ -1,0 +1,12 @@
+#!/usr/bin/env xdg-open
+
+[Desktop Entry]
+Version=1.0
+Terminal=false
+Type=Application
+Name=ShopBot
+Comment=
+Exec=/usr/bin/chromium-browser --app=http://localhost
+#Exec=/usr/bin/chromium-browser --profile-directory=Default --app-id=mekkpaibgigcofclbjfpbhajhoklabll
+Icon=/home/pi/Pictures/xShopBot4.ico
+#StartupWMClass=crx_mekkpaibgigcofclbjfpbhajhoklabll
