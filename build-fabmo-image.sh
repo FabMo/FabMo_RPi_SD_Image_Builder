@@ -123,7 +123,7 @@ copy_all_files() {
     install_file "$RESOURCE_DIR/icon.png" "/home/pi/Pictures/icon.png"
     install_file "$RESOURCE_DIR/xShopBot4.ico" "/home/pi/Pictures/xShopBot4.ico"
     plymouth-set-default-theme --rebuild-initrd pix
-    install_file "$RESOURCE_DIR/fabmo_linux_version.txt" "/boot"
+    install_file "$RESOURCE_DIR/fabmo-release.txt" "/boot"
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/etc"
 
     # Install the wf-panel-pi.ini to get some panel items in the menu
@@ -307,8 +307,8 @@ EOF
 
 some_extras () {
     # Install a ShopBot starter on Desktop; may work, still needs run setting File Manager to not ask options on launch executable file.
-    install_file "$RESOURCE_DIR/shopbot.desktop" "/home/pi/Desktop/shopbot.desktop"
-    install_file "$RESOURCE_DIR/chrome-eoehjepgffkecmikenhncmboihmfijif-Default.desktop" "/home/pi/.local/share/applications/chrome-eoehjepgffkecmikenhncmboihmfijif-Default.desktop"
+    install_file "$RESOURCE_DIR/shopbot-starter.desktop" "/home/pi/Desktop/shopbot-starter.desktop"
+    chmod +x /home/pi/Desktop/shopbot-starter.desktop
 }
 
 
