@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=keyboard
+Exec=/usr/bin/toggle-wvkbd.sh
+Comment=toggle virtual keyboard
+Terminal=false
+Icon=input-keyboard
+Type=Application

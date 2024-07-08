@@ -131,9 +131,9 @@ copy_all_files() {
 
     # New virtual keyboard for Bookworm and toggling it on and off
     install_file "$RESOURCE_DIR/toggle-wvkbd.sh" "/usr/bin/toggle-wvkbd.sh"
-    install_file "$RESOURCE_DIR/wvkbd.desktop" "/usr/bin//wvkbd.desktop"
+    install_file "$RESOURCE_DIR/virtual-keyboard.desktop" "/home/pi/.local/share/applications/virtual-keyboard.desktop"
     chmod +x /usr/bin/toggle-wvkbd.sh
-    chmod +x /usr/bin/wvkbd.desktop
+    chmod +x /home/pi/.local/share/applications/virtual-keyboard.desktop
 
     echo "Network, user utility, and system files copied."
     echo ""
