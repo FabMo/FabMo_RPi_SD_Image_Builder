@@ -130,7 +130,7 @@ copy_all_files() {
     install_file "$RESOURCE_DIR/wf-panel-pi.ini" "/home/pi/.config/wf-panel-pi.ini"
 
     # New virtual keyboard for Bookworm and toggling it on and off
-    install_file "$RESOURCE_DIR/togle-wvkbd.sh" "/usr/bin/toggle-wvkbd.sh"
+    install_file "$RESOURCE_DIR/toggle-wvkbd.sh" "/usr/bin/toggle-wvkbd.sh"
     install_file "$RESOURCE_DIR/wvkbd.desktop" "/usr/bin//wvkbd.desktop"
     chmod +x /usr/bin/toggle-wvkbd.sh
     chmod +x /usr/bin/wvkbd.desktop
@@ -334,8 +334,10 @@ main_installation() {
     make_misc_tool_symlinks 
     some_extras
 
+    echo ""
 
     echo "BUILD, Installation, and Configuration Complete. ==============(remove BUILD files?)===="
+    echo ""
     echo ""
     echo "MANUAL STEPS NOW REQUIRED:"
     echo "-Check to make sure expansion call is in cmdline.txt; last line should have init=/usr/lib/raspberrypi-sys-mods/firstboot"
