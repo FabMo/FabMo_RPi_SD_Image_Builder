@@ -6,7 +6,7 @@ autoconnect=true
 
 [wifi]
 mode=ap
-ssid=fabmoAP
+
 
 [ipv4]
 method=manual
