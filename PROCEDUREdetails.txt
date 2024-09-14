@@ -1,5 +1,6 @@
 Procedure to make NEW RPi SD Card Image
 =======================================
+* EASIEST TO already HAVE A KEYBOARD AND TRACK PAD or MOUSE PLUGGED into Raspberry Pi when doing these things!
 {This is a semi-automated system using the latest standard OS from Raspberry Pi [see Instructions PART A] which is then modified for FabMo with a
    script that is run on a RPi [Instructions PART B].}
 
@@ -20,12 +21,17 @@ PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy wi
 5. Use Win32Disk Imager to make the new "Working-OS-Image" SAVE THIS ==MASTER== FOR UPDATES ! (probably no need to change for months; this itself could be updated before a major release)
 
 
+--UPDATE VERSION IN ==>   fabmo-release.txt    [this will go in /boot(where viewable from SD on Windows PC) and /etc]
+--node versioning is done in Set up node.js of build-dabmo-image.sh in case it's version needs to be set ... *** tried setting to 18.x to match current dev but woud not install so went back to 16.x tho 18.19.0 after install
+    **## NEED TO GET DEPENDENCIES UPDATED
+
 PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Image)
 6. Copy the "Working-OS-Image" to an SD-card, with Balena Etcher. THIS will now be the SD card FOR our FabMo-RPi-SD-Image BUILD !
 7. Boot up this card up on a Raspberry Pi:
     - Go to Preferences > RPi COnfiguration > Interfaces > and turn SSH on if it is not
-8. THEN DO:
-    Into: /home/pi/Scripts
+8. Open up an ssh terminal connection, THEN DO:
+    (assuming in /home/pi)
+    sudo mkdir Scripts
     [copy into this new folder (you can use WinSCP logged on as pi) from "FabMo_RPi_SD_Image_Builder" current local repo]:
       	build-fabmo-image.sh
 	    resources [folder]
@@ -34,10 +40,13 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
 	                sudo ./build-fabmo-image.sh
 
 10. WHEN the script is finished running, check to make sure things got installed and permissions look right.
+    10.5 REMOVE THE BUILD SCRIPT AND RESOURCES
+
 11. DO NOT Reboot this card as a test if you want to make a small version as it seems to expand for the last time on the reboot (see cmd.txt init=)! 
-12. Make a copy of this SD card to a smaller SD card; 8G seems to work at the moment.
-13. This SD card can now be used with the Win32Disk Imager to make our NEW FabMo-RPi-Image
-14. Make a Zipped Copy of the NEW FabMo-RPi-Image for distribution.
+12. Make a copy of this SD card to a smaller SD card; 8G seems to work at the moment using SD Card Copier Accessory in RPi.
+13. This SD card can now be used with the Win32Disk Imager (GOOGLE DOCS OFF) to make our NEW FabMo-RPi-Image
+
+14. Make a Zipped Copy of the NEW FabMo-RPi-Image for distribution and post.
 
 Some details:
     = The BUILD script creates symlink for many of the systemd service files that FabMo uses and some scripts. This is done so that the
