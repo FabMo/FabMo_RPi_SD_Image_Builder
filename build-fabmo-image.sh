@@ -106,6 +106,8 @@ copy_all_files() {
     # hostapd configuration file (will not be updated with fabmo update)
     mkdir -p /etc/hostapd
     install_file "$RESOURCE_DIR/hostapd/hostapd.conf" "/etc/hostapd/hostapd.conf"
+    install_file "$RESOURCE_DIR/hostapd/hostapd.service" "/lib/systemd/system/hostapd.service"
+    chmod 644 /lib/systemd/system/hostapd.service
 
     # User Utilities
     mkdir -p /home/pi/Scripts
@@ -340,8 +342,8 @@ main_installation() {
     echo ""
     echo ""
     echo "MANUAL STEPS NOW REQUIRED:"
-    echo "-Check to make sure expansion call is in /boot/cmdline.txt; last line should have init=/usr/lib/raspberrypi-sys-mods/firstboot"
-    echo "-Enable running from desktop in FileManager Prefs."
+    echo "-Check to make sure expansion call is in /boot/firmware/cmdline.txt; last line should have init=/usr/lib/raspberrypi-sys-mods/firstboot"
+    echo "-Enable running from desktop in FileManager > Edit > Prefs (Don't ask options ...)."
     echo "-Delete this script and /resources from Scripts folder."
     echo "-? Set up rotation for small screen."
     echo ""

@@ -24,13 +24,14 @@ PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy wi
 --UPDATE VERSION IN ==>   fabmo-release.txt    [this will go in /boot(where viewable from SD on Windows PC) and /etc]
 --node versioning is done in Set up node.js of build-dabmo-image.sh in case it's version needs to be set ... *** tried setting to 18.x to match current dev but woud not install so went back to 16.x tho 18.19.0 after install
     **## NEED TO GET DEPENDENCIES UPDATED
+--check journalctl log size before doing this next time // see in onenote
 
 PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Image)
 6. Copy the "Working-OS-Image" to an SD-card, with Balena Etcher. THIS will now be the SD card FOR our FabMo-RPi-SD-Image BUILD !
 7. Boot up this card up on a Raspberry Pi:
     - Go to Preferences > RPi COnfiguration > Interfaces > and turn SSH on if it is not
 8. Open up an ssh terminal connection, THEN DO:
-    (assuming in /home/pi)
+    cd /home/pi
     sudo mkdir Scripts
     [copy into this new folder (you can use WinSCP logged on as pi) from "FabMo_RPi_SD_Image_Builder" current local repo]:
       	build-fabmo-image.sh

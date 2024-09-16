@@ -1,16 +1,19 @@
 [connection]
 id=wlan0_ap
+uuid=bca37e39-499c-317f-9db5-75a990c16838
 type=wifi
 interface-name=wlan0_ap
-autoconnect=true
+timestamp=1726515983
 
 [wifi]
 mode=ap
-
+ssid=fabmoAp_
 
 [ipv4]
-method=manual
 address1=192.168.42.1/24
+method=manual
 
 [ipv6]
 method=ignore
+
+[proxy]

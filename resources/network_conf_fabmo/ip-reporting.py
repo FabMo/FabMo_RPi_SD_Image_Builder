@@ -45,8 +45,6 @@ class NetworkConfigApp:
         frame = tk.Frame(self.root)
         frame.pack(padx=10, pady=10)
         self.ip_var = tk.StringVar()
-        ip_label = tk.Label(frame, textvariable=self.ip_var, font=("Arial", 18))
-        ip_label.pack(pady=5)
 
         # Set the window position to top right corner
         screen_width = self.root.winfo_screenwidth()
@@ -58,6 +56,9 @@ class NetworkConfigApp:
         # Create the label explaining the use of the IP address
         mode_label1 = tk.Label(frame, text="Enter this IP address in your browser\nto access ShopBot.", font=("Arial", 16))
         mode_label1.pack(pady=5)
+
+        ip_label = tk.Label(frame, textvariable=self.ip_var, font=("Arial", 18))
+        ip_label.pack(pady=5)
 
         mode_label2 = tk.Label(frame, text="- When switching wired connections wait 10 sec\n after disengaging before connecting new cable.", font=("Arial", 12))
         mode_label2.pack(pady=5)
@@ -94,23 +95,40 @@ class NetworkConfigApp:
             print("###=== X Trouble with reading tool_name!")
             syslog.syslog("###=== X Trouble with reading tool_name!") 
             return "no-name"
-    
-    def get_ip_address(self, interface='wlan0', retries=2, delay=3):  # was 3 & 4
-        cmd = f"nmcli -t -f IP4.ADDRESS dev show {interface} | grep IP4.ADDRESS | cut -d: -f2"
+        
+    def get_ip_address(self, interface='wlan0', retries=4, delay=4):
+        check_cmd = f"nmcli -t -f GENERAL.STATE dev show {interface} | grep 'connected' || true"
         for _ in range(retries):
             try:
-                ip_address = subprocess.check_output(cmd, shell=True).decode("utf-8").strip()
-                ip_address = ip_address.split("/")[0]  # remove /24
-                if ip_address:
-                    print(f"    => ip-check: {interface}  {ip_address}") 
-                    return ip_address
-            except subprocess.CalledProcessError:
-                pass
+                # First check if the interface is connected
+                result = subprocess.check_output(check_cmd, shell=True).decode("utf-8").strip()
+                if "connected" in result:
+                    # Get the IP address
+                    cmd = f"nmcli -t -f IP4.ADDRESS dev show {interface}"
+                    ip_output = subprocess.check_output(cmd, shell=True).decode("utf-8").strip()
+
+                    if ip_output and ":" in ip_output:
+                        ip_address = ip_output.split(":")[1].split("/")[0].strip()  # Extract IP and remove subnet mask
+                        if ip_address:
+                            print(f"    => ip-check: {interface}  {ip_address}")
+                            return ip_address
+                    #else:
+                    #    print(f"Unexpected IP output format: {ip_output}")
+                    #    syslog.syslog(f"Unexpected IP output format: {ip_output}")
+
+            except subprocess.CalledProcessError as e:
+                print(f"Command failed: {e}")
+                syslog.syslog(f"Command failed: {e}")
+            except Exception as e:
+                print(f"General exception: {e}")
+                syslog.syslog(f"General exception: {e}")
+
             time.sleep(delay)
+        
         print(f"    => failed to find ip - {interface}")
         syslog.syslog(f"    => failed to find ip - {interface}")
         return "-waiting-"
-
+    
     def is_eth0_active(self):
         cmd = "nmcli -t -f DEVICE,STATE dev status | grep eth0 | grep -q connected"
         result = subprocess.run(cmd, stdout=subprocess.PIPE, text=True, shell=True)
@@ -149,6 +167,8 @@ class NetworkConfigApp:
 
     # -------------------------------------------------------------  Main Loop
     def update_ip_display(self):
+        syslog.syslog("")
+        print("")
         syslog.syslog("###=> IP Udate Sequence Starting ...")
         print("###=> IP Udate Sequence Starting ...")
 
@@ -173,8 +193,8 @@ class NetworkConfigApp:
         print(f"###=> Checking eth0 = {eth}")
         syslog.syslog(f"###=> ip_address eth0: {ip_address}")
         print(f"###=> ip_address eth0: {ip_address}")
-        syslog.syslog(f"###=> wlan0ssid: {ssid}")
-        print(f"###=> wlan0ssid: {ssid}")
+        syslog.syslog(f"###=> wlan0 ssid: {ssid}")
+        print(f"###=> wlan0 ssid: {ssid}")
         syslog.syslog(f"###=> ip_address_wifi: {ip_address_wifi}")
         print(f"###=> ip_address_wifi: {ip_address_wifi}")
         syslog.syslog(f"###=> ip_address_wlan0_ap: {ip_address_wlan0_ap}")
@@ -182,21 +202,21 @@ class NetworkConfigApp:
 
         if eth:
             if ip_address.endswith(".44.1"):
-                self.root.title("- DIRECT COMPUTER CONNECTION - ")
+                self.root.title("using: DIRECT (ethernet) PC CONNECTION    ")
                 self.name = self.tool_name + "-PC@192.168.44.1"
                 self.ip_var.set("192.168.44.1")
             else:
-                self.root.title("- LOCAL NETWORK (LAN) CONNECTION -")
+                self.root.title("using: LOCAL NETWORK (ethernet) CONNECTION    ")
                 self.name = self.tool_name + "-LAN@" + ip_address
                 self.ip_var.set(f"{ip_address}")
         elif ssid:
-            str_title = "- " + ssid + "- NETWORK WiFi CONNECTION -"
+            str_title = "using: " + ssid + " NETWORK WiFi    "
             self.root.title(str_title)
             self.name = self.tool_name + "-wifi@" + ip_address_wifi
             self.ip_var.set(f"{ip_address_wifi}")
         else:
             if ip_address_wlan0_ap.endswith(".42.1"):
-                self.root.title("- AP Mode CONNECTION - ")
+                self.root.title("using: AP Mode CONNECTION from PC    ")
                 self.name = self.tool_name + "-AP@192.168.42.1"
                 self.ip_var.set("192.168.42.1")
             else:
@@ -209,9 +229,9 @@ class NetworkConfigApp:
             self.last_name = self.name
 
         syslog.syslog(f"###=> name={self.name} last_name={self.last_name}")
-        syslog.syslog(f"      ip={ip_address}")
+        syslog.syslog(f"      ip={self.ip_var.get()}")
         print(f"###=> name={self.name} last_name={self.last_name}")
-        print(f"      ip={ip_address}")
+        print(f"      ip={self.ip_var.get()}")
 
         self.root.after(5000, self.update_ip_display)  # Schedule next IP update
 

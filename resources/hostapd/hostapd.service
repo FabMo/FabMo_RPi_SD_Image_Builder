@@ -1,0 +1,16 @@
+[Unit]
+Description=Access point and authentication server for Wi-Fi and Ethernet
+After=network.target setup-wlan0_ap.service
+Wants=network-online.target
+
+[Service]
+
+ExecStartPre=/bin/sleep 5
+
+ExecStart=/usr/sbin/hostapd -P /run/hostapd/hostapd.pid /etc/hostapd/hostapd.conf
+ExecReload=/bin/kill -HUP
+PIDFile=/run/hostapd/hostapd.pid
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
