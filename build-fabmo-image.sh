@@ -187,7 +187,7 @@ setup_fabmo() {
 # ... this is done after fabmo is installed to prevent changes to the fabmo update from being copied to the image
 # install hostapd service file and other symlinks
 make_misc_tool_symlinks () {
-    install_file "$FABMO_RESOURCE_DIR/hostapd/hostapd.service" "/lib/systemd/system/hostapd.service"
+    install_file "$RESOURCE_DIR/hostapd/hostapd.service" "/lib/systemd/system/hostapd.service"
     chmod -x /lib/systemd/system/hostapd.service
     # Create the directory for hostapd PID file
     mkdir -p /run/hostapd
