@@ -182,12 +182,12 @@ setup_fabmo() {
     echo ""
 }
 
-# Move files from fabmo/files to the correct locations and set permissions 
+# Move files from fabmo/files to the correct locations and set permissions **BUT CURRENT VERSIONS NEED TO BE IN PLACE FIRST in fabmo/files !
 # ... this is done to keep changes in the fabmo update rather than the image 
 # ... this is done after fabmo is installed to prevent changes to the fabmo update from being copied to the image
 # install hostapd service file and other symlinks
 make_misc_tool_symlinks () {
-    install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/hostapd.service" "/lib/systemd/system/hostapd.service"
+    install_file "$FABMO_RESOURCE_DIR/hostapd/hostapd.service" "/lib/systemd/system/hostapd.service"
     chmod -x /lib/systemd/system/hostapd.service
     # Create the directory for hostapd PID file
     mkdir -p /run/hostapd
