@@ -21,7 +21,7 @@ PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy wi
 5. Use Win32Disk Imager to make the new "Working-OS-Image" SAVE THIS ==MASTER== FOR UPDATES ! (probably no need to change for months; this itself could be updated before a major release)
 
 
---UPDATE VERSION IN ==>   fabmo-release.txt    [this will go in /boot(where viewable from SD on Windows PC) and /etc]
+--UPDATE VERSION IN ==>   fabmo-release.txt (2 places in this file)    [this will go in /boot(where viewable from SD on Windows PC) and /etc] {{JUST INCREMENT THESE SEQUENTIALLY, no dev versions}}
 --node versioning is done in Set up node.js of build-dabmo-image.sh in case it's version needs to be set ... *** tried setting to 18.x to match current dev but woud not install so went back to 16.x tho 18.19.0 after install
     **## NEED TO GET DEPENDENCIES UPDATED
 --check journalctl log size before doing this next time // see in notes in onenote
