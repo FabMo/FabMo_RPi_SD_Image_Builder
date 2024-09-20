@@ -32,7 +32,7 @@ PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy wi
 
 PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Image)
 6. Copy the "Working-OS-Image" to an SD-card, with Balena Etcher. THIS will now be the SD card FOR our FabMo-RPi-SD-Image BUILD !
-7. Boot up this card up on a Raspberry Pi:
+7. Boot up this card up on a Raspberry Pi (I have been using RPi5):
     - Go to Preferences > RPi COnfiguration > Interfaces > and turn SSH on if it is not
 8. Open up an ssh terminal connection, THEN DO:
     cd /home/pi
