@@ -5,8 +5,7 @@ Procedure to make NEW RPi SD Card Image
    script that is run on a RPi [Instructions PART B].}
 
 PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy with we can just re-use for months)
-** Maybe REPLACE 1 and 2 by doing the imaging on the Pi itself?? **
-** Check out the new "sdm" system to improve precustomization of this system and potentially get smaller zipped image for shipping **
+   ** Check out the new "sdm"? system to improve precustomization of this system and potentially get smaller zipped image for shipping **
 1. Download image from Raspi Foundation to PC [Current 64bit Desktop (w/o recommended software) Image] and save to a "build" folder.
     > NOW USING LITE VERSION TO GET ON 8G
 2. Use this image to create an initial SD-card using Balena Etcher.
@@ -17,7 +16,7 @@ PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy wi
     - make dir   /home/pi/Scripts 
     - fix file running from File Manager 
     - install rpi-connect, may not be included in lite version
-4. Shut down the RPi, remove this card, and bring the card back to PC.
+4. Shut down the RPi correctly, remove this card, and bring the card back to PC.
 5. Use Win32Disk Imager to make the new "Working-OS-Image" SAVE THIS ==MASTER== FOR UPDATES ! (probably no need to change for months; this itself could be updated before a major release)
 
 
@@ -87,5 +86,6 @@ Some details:
 
 
     *this LIST is INCOMPLETE ! finish ... 
-    *Note that modify-priorities and set-network-priorities are not being used from this point  
+    *Note that modify-priorities and set-network-priorities are no longer being used
+    *It is possible that a systemctl reload-daemon may be needed for symlinks whose content is altered! 
 
