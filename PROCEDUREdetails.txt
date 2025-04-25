@@ -57,13 +57,16 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
 	                sudo ./build-fabmo-image.sh
 
 12. WHEN the script is finished running, check to make sure things got installed and permissions look right.
-    10.5 REMOVE THE BUILD SCRIPT AND RESOURCES
 
-13. DO NOT Reboot this card as a test if you want to make a small version as it seems to expand for the last time on the reboot (see cmd.txt init=)! 
-14. Make a copy of this SD card to a smaller SD card; 8G seems to work at the moment using SD Card Copier Accessory in RPi.
-15. This SD card can now be used with the Win32Disk Imager (GOOGLE DOCS OFF) to make our NEW FabMo-RPi-Image
+13. REMOVE THE BUILD SCRIPT AND RESOURCES
 
-16. Make a Zipped Copy of the NEW FabMo-RPi-Image for distribution and post.
+14. DO NOT Reboot this card as a test if you want to make a small version as it seems to expand for the last time on the reboot (see cmd.txt init=)! 
+15. Make a copy of this SD card to a smaller SD card; 8G seems to work at the moment using SD Card Copier Accessory in RPi.
+16. This SD card can now be used with the Win32Disk Imager (GOOGLE DOCS OFF) to make our NEW FabMo-RPi-Image
+
+17. Make a Zipped Copy of the NEW FabMo-RPi-Image for distribution and post.
+
+
 
 Some details:
     = The BUILD script creates symlink for many of the systemd service files that FabMo uses and some scripts. This is done so that the

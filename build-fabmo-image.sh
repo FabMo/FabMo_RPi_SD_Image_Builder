@@ -170,10 +170,11 @@ setup_fabmo() {
     git clone https://github.com/FabMo/FabMo-Updater.git /fabmo-updater
     cd /fabmo-updater
     npm install
+
     # The updater needs to be started twice to create config files and run
-    npm run start
+    #npm run start
     # Delay to allow the updater to create the config files
-    sleep 15
+    #sleep 15
     #npm run start
     
     echo "installed fabmo-updater"
@@ -224,7 +225,7 @@ load_and_initialize_systemd_services() {
     cd /etc/systemd/system
 
     echo "Creating systemd sym-links from fabmo/files ..."
-    SERVICES=("fabmo.service" "camera-server-1.service" "camera-server-2.service")
+    SERVICES=("fabmo.service" "camera-server-1.service" "camera-server-2.service" "usb_logger.service")
     # Loop through the services and create symlinks
     for SERVICE in "${SERVICES[@]}"; do
         if [ -f "/fabmo/files/$SERVICE" ]; then
