@@ -49,6 +49,7 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
 9. Open up an ssh terminal connection, THEN DO:
     cd /home/pi
     sudo mkdir Scripts
+    make this executable
     [copy into this new folder (you can use WinSCP logged on as pi) from "FabMo_RPi_SD_Image_Builder" current local repo]:
       	build-fabmo-image.sh
 	    resources [folder]

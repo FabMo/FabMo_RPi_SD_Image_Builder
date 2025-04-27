@@ -8,5 +8,5 @@ Name=ShopBot
 Comment=
 Exec=/usr/bin/chromium-browser --app=http://localhost
 #Exec=/usr/bin/chromium-browser --profile-directory=Default --app-id=mekkpaibgigcofclbjfpbhajhoklabll
-Icon=/home/pi/Pictures/xShopBot4.ico
+Icon=/home/pi/Pictures/ShopBot-Desktop-Icon-Transparent.png
 #StartupWMClass=crx_mekkpaibgigcofclbjfpbhajhoklabll
