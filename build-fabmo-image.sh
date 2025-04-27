@@ -9,6 +9,8 @@ clean() {
     rm -rf /fabmo
     rm -rf /fabmo-updater
     rm -rf /opt/fabmo
+    rm -rf /opt/fabmo_backup
+    rm -rf /opt/fabmo_backup_atStart
 }
 
 # Function to wait for the dpkg lock to be released
@@ -103,18 +105,12 @@ copy_all_files() {
     # NetworkManager make sure we have the right permissions on these files, they are sensitive
     chmod 600 /etc/NetworkManager/system-connections/*
     
-    # hostapd configuration file (will not be updated with fabmo update)
-    mkdir -p /etc/hostapd
-    install_file "$RESOURCE_DIR/hostapd/hostapd.conf" "/etc/hostapd/hostapd.conf"
-    install_file "$RESOURCE_DIR/hostapd/hostapd.service" "/lib/systemd/system/hostapd.service"
-    chmod 644 /lib/systemd/system/hostapd.service
-
     # User Utilities
     mkdir -p /home/pi/Scripts
     install_file "$RESOURCE_DIR/fabmo.bashrc" "/home/pi/.bashrc"
     install_file "$RESOURCE_DIR/dev-build.sh" "/home/pi/Scripts"
 
-    # Key USB symlink file for FabMo and VFD
+    # Key USB symlink file for FabMo-G2 and VFD USB devices
     install_file "$RESOURCE_DIR/99-fabmo-usb.rules" "/etc/udev/rules.d/"
     chmod 644 /etc/udev/rules.d/99-fabmo-usb.rules
 
@@ -123,7 +119,7 @@ copy_all_files() {
     install_file "$RESOURCE_DIR/shopbot-pi-bkgnd.png" "/home/pi/Pictures/shopbot-pi-bkgnd.png"
     install_file "$RESOURCE_DIR/FabMo-Icon-03.png" "/home/pi/Pictures/FabMo-Icon-03.png"
     install_file "$RESOURCE_DIR/icon.png" "/home/pi/Pictures/icon.png"
-    install_file "$RESOURCE_DIR/xShopBot4.ico" "/home/pi/Pictures/xShopBot4.ico"
+    install_file "$RESOURCE_DIR/ShopBot Buddy Icon Transparent.png" "/home/pi/Pictures/ShopBot Buddy Icon Transparent.png"
     plymouth-set-default-theme --rebuild-initrd pix
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/boot"
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/etc"
@@ -155,8 +151,8 @@ setup_desktop_environment() {
     echo ""
 }
 
-# Setup FabMo // Note that many resource files are in the fabmo/files directory; so this needs to be installed before copying
-# ... this is partly done to keep changes in the fabmo update rather than the image and to prevent changes to permissions from copying between systems
+# MAIN Setup FabMo // Note that many resource files are in the fabmo/files directory; so we need to do the MAIN installation before further setup
+# ... this is partly done to keep changes in the fabmo update rather than the image
 setup_fabmo() {
     echo "cloning fabmo-engine"
     git clone https://github.com/FabMo/FabMo-Engine.git /fabmo
@@ -171,6 +167,7 @@ setup_fabmo() {
     cd /fabmo-updater
     npm install
 
+    # OBSOLETE but a repeated boot is still needed to get everything in place and running
     # The updater needs to be started twice to create config files and run
     #npm run start
     # Delay to allow the updater to create the config files
@@ -183,11 +180,24 @@ setup_fabmo() {
     echo ""
 }
 
+#------------------------------------------------------------------------------------------------------------------------------------
+## CONTENT FROM fabmo and fabmo-updater NOW AVAILABLE in the install process 
+#------------------------------------------------------------------------------------------------------------------------------------
+
 # Move files from fabmo/files to the correct locations and set permissions **BUT CURRENT VERSIONS NEED TO BE IN PLACE FIRST in fabmo/files !
-# ... this is done to keep changes in the fabmo update rather than the image 
+# ... this is done to keep as much as reasonable in the fabmo update rather than the image 
 # ... this is done after fabmo is installed to prevent changes to the fabmo update from being copied to the image
 # install hostapd service file and other symlinks
+# NOTE THAT hostapd and dnsmasq are still managed from here and not in the fabmo update:
+#                                                                            /resources/dnsmasq/
+#                                                                                         dnsmasq.conf
+#                                                                            /resources/hostapd/
+#                                                                                         hostapd.conf
+#                                                                                         hostapd.service
 make_misc_tool_symlinks () {
+    # hostapd configuration file (will not be updated with fabmo update)
+    mkdir -p /etc/hostapd
+    install_file "$RESOURCE_DIR/hostapd/hostapd.conf" "/etc/hostapd/hostapd.conf"
     install_file "$RESOURCE_DIR/hostapd/hostapd.service" "/lib/systemd/system/hostapd.service"
     chmod -x /lib/systemd/system/hostapd.service
     # Create the directory for hostapd PID file
@@ -197,16 +207,15 @@ make_misc_tool_symlinks () {
     systemctl unmask hostapd
     systemctl daemon-reload
     systemctl enable hostapd
-    
-    # Install setup-wlan0_ap service file, shell file now in network_conf_fabmo
-    install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
-
     # Key dnsmasq configuration file (will not be updated with fabmo update)
     install_file "$RESOURCE_DIR/dnsmasq/dnsmasq.conf" "/etc/dnsmasq.conf"
     # Make sure we have the right permissions on this file, it is sensitive
     chmod 755 /etc/dnsmasq.conf
 
-    # enabled them
+    # Install setup-wlan0_ap service file, shell file now in fabmo/files/network_conf_fabmo
+    install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
+
+    # enable all of these them
     systemctl daemon-reload
     systemctl enable setup-wlan0_ap
     systemctl enable dnsmasq
@@ -224,7 +233,7 @@ load_and_initialize_systemd_services() {
     # FabMo and Updater SystemD Service symlinks to files
     cd /etc/systemd/system
 
-    echo "Creating systemd sym-links from fabmo/files ..."
+    echo "Creating systemd sym-links for listed files in fabmo/files ..."
     SERVICES=("fabmo.service" "camera-server-1.service" "camera-server-2.service" "usb_logger.service")
     # Loop through the services and create symlinks
     for SERVICE in "${SERVICES[@]}"; do
@@ -240,7 +249,7 @@ load_and_initialize_systemd_services() {
         fi
     done    
     
-    echo "Creating systemd sym-links from fabmo/files/network_conf_fabmo ..."
+    echo "Creating systemd sym-links listed files in fabmo/files/network_conf_fabmo ..."
     SERVICES=("network-monitor.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
     for SERVICE in "${SERVICES[@]}"; do
         if [ -f "/fabmo/files/network_conf_fabmo/$SERVICE" ]; then
@@ -255,9 +264,9 @@ load_and_initialize_systemd_services() {
         fi
     done
     
-    echo "Copy the recent_wifi.json from resources/network_conf_fabmo to /etc/network_conf_fabmo" 
+    echo "Copy the recent_wifi.json from /fabmo/files/network_conf_fabmo to /etc/network_conf_fabmo" 
     mkdir -p /etc/network_conf_fabmo
-    install_file "$RESOURCE_DIR/network_conf_fabmo/recent_wifi.json" "/etc/network_conf_fabmo/recent_wifi.json"
+    install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/recent_wifi.json" "/etc/network_conf_fabmo/recent_wifi.json"
     echo "... done created /etc/network_conf_fabmo/recent_wifi.json"
 
     echo "Creating systemd sym-links from fabmo-updater ..."
@@ -307,15 +316,14 @@ EOF
     systemctl enable network-monitor.service
     systemctl enable camera-server-1.service
     systemctl enable camera-server-2.service
-    systemctl enable export-netcfg-thumbdrive.service
-    systemctl enable export-netcfg-thumbdrive.path
+    systemctl enable usb_logger.service
 
     echo "Systemd services setup complete."
     echo ""
 }
 
 some_extras () {
-    # Install a ShopBot starter on Desktop; may work, still needs run setting File Manager to not ask options on launch executable file.
+    # Install a ShopBot starter on Desktop; may work, requires the setting fix in RPi File Manager to not ask options on launch executable file.
     install_file "$RESOURCE_DIR/shopbot-starter.desktop" "/home/pi/Desktop/shopbot-starter.desktop"
     chmod +x /home/pi/Desktop/shopbot-starter.desktop
 }

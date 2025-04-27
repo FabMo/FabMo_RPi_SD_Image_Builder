@@ -5,7 +5,7 @@ Terminal=false
 Type=Application
 Name=ShopBot
 Exec=/usr/bin/chromium-browser --profile-directory=Default --app-id=eoehjepgffkecmikenhncmboihmfijif
-Icon=/home/pi/Pictures/xShopBot4.ico
+Icon=/home/pi/Pictures/ShopBot Desktop Icon Transparent.png
 StartupWMClass=crx_eoehjepgffkecmikenhncmboihmfijif
 Terminal=false
 NoDisplay=true
