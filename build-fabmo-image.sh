@@ -119,7 +119,7 @@ copy_all_files() {
     install_file "$RESOURCE_DIR/shopbot-pi-bkgnd.png" "/home/pi/Pictures/shopbot-pi-bkgnd.png"
     install_file "$RESOURCE_DIR/FabMo-Icon-03.png" "/home/pi/Pictures/FabMo-Icon-03.png"
     install_file "$RESOURCE_DIR/icon.png" "/home/pi/Pictures/icon.png"
-    install_file "$RESOURCE_DIR/ShopBot Buddy Icon Transparent.png" "/home/pi/Pictures/ShopBot Buddy Icon Transparent.png"
+    install_file "$RESOURCE_DIR/ShopBot-Desktop-Icon-Transparent.png" "/home/pi/Pictures/ShopBot-Desktop-Icon-Transparent.png"
     plymouth-set-default-theme --rebuild-initrd pix
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/boot"
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/etc"
