@@ -224,6 +224,7 @@ make_misc_tool_symlinks () {
     sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_heat_volts.sh /usr/local/bin/ck_heat_volts
     sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_network.sh /usr/local/bin/ck_network
     sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_services.sh /usr/local/bin/ck_services
+    sudo ln -sf $FABMO_RESOURCE_DIR/tools/ld_firmware.sh /usr/local/bin/ld_firmware
 }
 
 # SystemD
