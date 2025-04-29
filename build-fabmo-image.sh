@@ -165,6 +165,9 @@ setup_fabmo() {
     echo "cloning fabmo-updater"
     git clone https://github.com/FabMo/FabMo-Updater.git /fabmo-updater
     cd /fabmo-updater
+    sudo git status
+    sudo git checkout a7c0b35d5e2a53b178ce9b225c62e8012396ec6d
+    sudo git status
     npm install
 
     # OBSOLETE but a repeated boot is still needed to get everything in place and running
