@@ -59,7 +59,11 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
 
 12. WHEN the script is finished running, check to make sure things got installed and permissions look right.
 
-13. REMOVE THE BUILD SCRIPT AND RESOURCES
+13. Then do additional current little fixes:
+    -REMOVE THE BUILD SCRIPT AND RESOURCES
+    -size bottom bar to medium
+    -make sure RPi connect visible in bar (add and move to left)
+    -make desktop color blue if not
 
 14. DO NOT Reboot this card as a test if you want to make a small version as it seems to expand for the last time on the reboot (see cmd.txt init=)! 
 15. Make a copy of this SD card to a smaller SD card; 8G seems to work at the moment using SD Card Copier Accessory in RPi.
@@ -89,7 +93,7 @@ Some details:
                    ck_heat_volts.sh
                    ck_network.sh
                    ck_services.sh
-                   setup_wlan0_ap.sh     *move to networking area?
+                   ld_firmware.sh
                /sysd-services
                    hostapd.service
                    setup-wlan0_ap.service
