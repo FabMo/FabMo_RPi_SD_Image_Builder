@@ -4,12 +4,13 @@ Procedure to make NEW RPi SD Card Image
 {This is a semi-automated system using the latest standard OS from Raspberry Pi [see Instructions PART A] which is then modified for FabMo with a
    script that is run on a RPi [Instructions PART B].}
 
+** SPEED OF ALL THE SD Copy, Compress, Uncompress processes seems to benefit from having a fresh boot of computer. Zipping the final file seems to take ~50min!
 
 PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy with we can just re-use for months)
    ** Check out the new "sdm"? system to improve precustomization of this system and potentially get smaller zipped image for shipping **
 1. Download image from Raspi Foundation to PC [Current 64bit Desktop (w/o recommended software) Image] and save to a "build" folder.
     https://www.raspberrypi.com/software/operating-systems/#raspberry-pi-os-64-bit
-    > NOW USING DESKTOP VERSION without recommended software TO GET ON 8G for best zip
+    > NOW USING DESKTOP VERSION without recommended software TO KEEP SMALL for best zip
     ||Last: 2024-11-19-raspios-bookworm-arm64.img.xz (and then updated to 4/24/25)
     ||My new computer (snapdragon) seems to require me to unzip before using Balena (I have not had to do that in the past)
 
@@ -20,25 +21,23 @@ PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy wi
           > pi; shopbot
           > skip wifi network (if you've got lan connection, better)
 	- Updating ... this takes a while because it --brings in all the latest updates--
-    - make hostname "shopbot" in: Pi ICON > Preferences > RPi Config > Change Hostname
-    - enable SSH in: Pi ICON > Preferences > RPi Config > Interfaces
-    - OK to reboot here when requested   ** maybe NOT ??? might wipe out auto memory extension
+    - ==> you will do a restart here
+    - make hostname "shopbot"; in: Pi ICON > Preferences > RPi Config > Change Hostname
+    - enable SSH in: Pi(icon) > Preferences > RPi Config > Interfaces
+    - Skip reboot here if requested ...
+    - fix file running from: FileManage(icon) > Edit > Preferences > CHECK in BOX "Don't ask options on launch executable file" 
     - sudo mkdir /home/pi/Scripts [USE TERMINAL]
-    - fix file running from: FileManager ICON > Edit > Preferences > CHECKinBOX "Don't ask options on launch executable file" 
-    - install rpi-connect, may not be included in lite version
-4. Shut down the RPi correctly from: RPi ICON > Logout > Shutdown
+4. Shut down the RPi correctly from: RPi(icon) > Logout > Shutdown [this is the only time I bother to shut down correctly]
 5. Remove this card, and bring the card back to PC.
 6. Use Win32Disk Imager to make the new "Working-OS-Image" SAVE THIS ==MASTER== FOR UPDATES ! (probably no need to change for months; this itself could be updated before a major release)
 
 FINAL THINGS to take care of here to make ready for part B.
+  [ LAST IMAGE VERSION = 26-06]
 --UPDATE VERSION IN ==>   fabmo-release.txt (2 places in this file)    [this will go in /boot(where viewable from SD on Windows PC) and /etc] {{JUST INCREMENT THESE SEQUENTIALLY, no dev versions}}
 --node versioning is done in Set up node.js of build-dabmo-image.sh in case it's version needs to be set ... *** tried setting to 18.x to match current dev but woud not install so went back to 16.x tho 18.19.0 after install
     **## NEED TO GET DEPENDENCIES UPDATED
+
 --check journalctl log size before doing this next time // see in notes in onenote
-
-**NOTE ==> COPY FABMO FILES TO FABMO //  NEED a Little chart of this including what is symlinked and what is not
-    /fabmo/files/network_conf_fabmo  and check for other potential updates !!!
-
 
 
 
@@ -51,8 +50,9 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
     sudo mkdir Scripts
     make this executable
     [copy into this new folder (you can use WinSCP logged on as pi) from "FabMo_RPi_SD_Image_Builder" current local repo]:
-      	build-fabmo-image.sh
 	    resources [folder]
+      	build-fabmo-image.sh
+    Then make this last file executable by anyone, 777    
 10. NEXT DO: 
 	From Terminal:  cd /home/pi/Scripts  
 	                sudo ./build-fabmo-image.sh
@@ -60,10 +60,16 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
 12. WHEN the script is finished running, check to make sure things got installed and permissions look right.
 
 13. Then do additional current little fixes:
-    -REMOVE THE BUILD SCRIPT AND RESOURCES
+    -REMOVE THE BUILD SCRIPT AND RESOURCES (forgot in 26-06!)
     -size bottom bar to medium
-    -make sure RPi connect visible in bar (add and move to left)
-    -make desktop color blue if not
+    - set Task Bar size, position: bottom, medium
+    - set Desktop TEXT color to dark blue
+    - Add RPI-CONNECT to Menu Bar; this is a bit awkward, but put on right side then move over to left
+    - Add squeekboard to right of time
+    - remove left side keyboard (now obsolete)
+    - Ck UPDATE of version file shows:  /etc/fabmo-release.txt
+    
+
 
 14. DO NOT Reboot this card as a test if you want to make a small version as it seems to expand for the last time on the reboot (see cmd.txt init=)! 
 15. Make a copy of this SD card to a smaller SD card; 8G seems to work at the moment using SD Card Copier Accessory in RPi.

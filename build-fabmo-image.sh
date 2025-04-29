@@ -357,7 +357,8 @@ main_installation() {
     echo "-Delete this script and /resources from Scripts folder."
     echo "-? Set up rotation for small screen."
     echo ""
-    echo "-MAKE 8G COPY NOW, BEFORE FIRST BOOT"
+    echo ""
+    echo "-Now do final UI fussing then > MAKE 8G COPY, BEFORE FIRST BOOT"
     echo ""
     echo ""
 }
