@@ -207,11 +207,24 @@ make_misc_tool_symlinks () {
     systemctl unmask hostapd
     systemctl daemon-reload
     systemctl enable hostapd
-    # Key dnsmasq configuration file (will not be updated with fabmo update)
-    install_file "$RESOURCE_DIR/dnsmasq/dnsmasq.conf" "/etc/dnsmasq.conf"
-    # Make sure we have the right permissions on this file, it is sensitive
-    chmod 755 /etc/dnsmasq.conf
 
+    # Key dnsmasq configuration files (will not be updated with fabmo update)
+    install_file "$RESOURCE_DIR/dnsmasq/dnsmasq.conf" "/etc/dnsmasq.conf"
+    chmod 755 /etc/dnsmasq.conf
+    
+    # Create dnsmasq.d directory if it doesn't exist
+    mkdir -p /etc/dnsmasq.d
+    chmod 755 /etc/dnsmasq.d
+    
+    # Install mode-specific dnsmasq configurations
+    install_file "$RESOURCE_DIR/dnsmasq/ap-only.conf" "/etc/dnsmasq.d/ap-only.conf"
+    install_file "$RESOURCE_DIR/dnsmasq/direct-mode.conf" "/etc/dnsmasq.d/direct-mode.conf"
+    chmod 644 /etc/dnsmasq.d/ap-only.conf
+    chmod 644 /etc/dnsmasq.d/direct-mode.conf
+    
+    # Set initial mode to ap-only (safer default - won't serve DHCP on LAN)
+    ln -sf /etc/dnsmasq.d/ap-only.conf /etc/dnsmasq.d/active-mode.conf
+    
     # Install setup-wlan0_ap service file, shell file now in fabmo/files/network_conf_fabmo
     install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
 
@@ -219,7 +232,7 @@ make_misc_tool_symlinks () {
     systemctl daemon-reload
     systemctl enable setup-wlan0_ap
     systemctl enable dnsmasq
-
+    
 # Create Sym-links for External FabMo Tools services
     sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_heat_volts.sh /usr/local/bin/ck_heat_volts
     sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_network.sh /usr/local/bin/ck_network
