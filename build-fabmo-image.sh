@@ -41,7 +41,7 @@ install_packages_and_configure() {
     wait_for_dpkg_lock
     echo "Updating package lists..."
     apt-get update
-    apt-get install -y bossa-cli hostapd dnsmasq xserver-xorg-input-libinput pi-package jackd2 python3-pyudev python3-tornado wvkbd
+    apt-get install -y bossa-cli hostapd dnsmasq xserver-xorg-input-libinput pi-package jackd2 python3-pyudev python3-tornado wvkbd dos2unix
     # Preconfigure jackd2 (audio) to allow real-time process priority
     debconf-set-selections <<< "jackd2 jackd/tweak_rt_limits boolean true"
     echo "Packages installed."
@@ -154,6 +154,9 @@ setup_desktop_environment() {
 # MAIN Setup FabMo // Note that many resource files are in the fabmo/files directory; so we need to do the MAIN installation before further setup
 # ... this is partly done to keep changes in the fabmo update rather than the image
 setup_fabmo() {
+    # Ensure git respects LF line endings
+    git config --global core.autocrlf input
+
     echo "cloning fabmo-engine"
     git clone https://github.com/FabMo/FabMo-Engine.git /fabmo
     cd /fabmo
@@ -161,6 +164,11 @@ setup_fabmo() {
     npm install
     echo "building fabmo-engine"
     npm run build 
+
+    # Verify and fix line endings for shell scripts
+    echo "Ensuring LF line endings for shell scripts..."
+    find /fabmo/files -type f -name "*.sh" -exec dos2unix {} \; 2>/dev/null || true
+    find /fabmo/files/network_conf_fabmo -type f -name "*.sh" -exec dos2unix {} \; 2>/dev/null || true
 
     echo "cloning fabmo-updater"
     git clone https://github.com/FabMo/FabMo-Updater.git /fabmo-updater
