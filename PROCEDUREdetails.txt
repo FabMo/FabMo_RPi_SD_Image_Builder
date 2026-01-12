@@ -54,14 +54,15 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
 8. Boot up this card up on a Raspberry Pi (I have been using RPi5):
     - Go to Preferences > RPi COnfiguration > Interfaces > and turn SSH on if it is not (already is)
 
-8.5 Should I just put a temporary copy of this repo on the pi ???
--trying it 1/11/26 ...
-
 9. Open up an ssh terminal connection (pi;shopbot), THEN DO:
+    Put a temporary copy of this repo on the pi:  
+    cd /
+    sudo git clone https://github.com/fabmo/FabMo_RPi_SD_Image_Builder Image_Builder
+    Then:
     cd /home/pi
     sudo mkdir Scripts
     (make this executable) sudo chmod +x Scripts
-    [copy into this new folder (you can use WinSCP logged on as pi) from "FabMo_RPi_SD_Image_Builder" current local repo]:
+    [copy into this new folder (you can use WinSCP logged on as pi) from "Image_Builder" current local repo]:
 	    resources [folder]
         ?? tools [folder] ??
       	build-fabmo-image.sh
@@ -73,10 +74,10 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
 12. WHEN the script is finished running, check to make sure things got installed and permissions look right.
 
 13. Then do additional current little fixes:
-    -REMOVE THE BUILD SCRIPT AND RESOURCES (forgot in 26-06!)
+    -REMOVE THE BUILD SCRIPT AND RESOURCES as well as the TEMP Repo 
     -size bottom bar to medium
     - set Task Bar size, position: bottom, medium
-    - set Desktop TEXT color to dark blue
+    - set Desktop TEXT color to dark blue #353A92 ???
     - Add RPI-CONNECT to Menu Bar; this is a bit awkward, but put on right side then move over to left
     - Add squeekboard to right of time  ???
     - remove left side keyboard (now obsolete) ???
