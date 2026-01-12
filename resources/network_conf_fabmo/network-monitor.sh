@@ -49,7 +49,19 @@ reset_failure_count() {
 restart_dnsmasq_if_needed() {
     CURRENT_PROFILE=$1
     if [ "$CURRENT_PROFILE" != "$LAST_PROFILE" ]; then
-        log "Profile changed to $CURRENT_PROFILE, restarting dnsmasq service"
+        log "Profile changed to $CURRENT_PROFILE, reconfiguring dnsmasq"
+        
+        # Switch dnsmasq configuration based on profile
+        # This prevents DHCP from being served on eth0 when connected to LAN
+        if [ "$CURRENT_PROFILE" = "direct" ]; then
+            log "Activating direct-mode dnsmasq config (DHCP on eth0 + wlan0_ap)"
+            sudo ln -sf /etc/dnsmasq.d/direct-mode.conf /etc/dnsmasq.d/active-mode.conf
+        else
+            log "Activating ap-only dnsmasq config (DHCP only on wlan0_ap)"
+            sudo ln -sf /etc/dnsmasq.d/ap-only.conf /etc/dnsmasq.d/active-mode.conf
+        fi
+        
+        # Restart dnsmasq to apply new configuration
         sudo systemctl restart dnsmasq
         LAST_PROFILE=$CURRENT_PROFILE
     fi

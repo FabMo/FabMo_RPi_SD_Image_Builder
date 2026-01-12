@@ -41,7 +41,7 @@ install_packages_and_configure() {
     wait_for_dpkg_lock
     echo "Updating package lists..."
     apt-get update
-    apt-get install -y bossa-cli hostapd dnsmasq xserver-xorg-input-libinput pi-package jackd2 python3-pyudev python3-tornado wvkbd
+    apt-get install -y bossa-cli hostapd dnsmasq xserver-xorg-input-libinput pi-package jackd2 python3-pyudev python3-tornado wvkbd dos2unix
     # Preconfigure jackd2 (audio) to allow real-time process priority
     debconf-set-selections <<< "jackd2 jackd/tweak_rt_limits boolean true"
     echo "Packages installed."
@@ -154,6 +154,9 @@ setup_desktop_environment() {
 # MAIN Setup FabMo // Note that many resource files are in the fabmo/files directory; so we need to do the MAIN installation before further setup
 # ... this is partly done to keep changes in the fabmo update rather than the image
 setup_fabmo() {
+    # Ensure git respects LF line endings
+    git config --global core.autocrlf input
+
     echo "cloning fabmo-engine"
     git clone https://github.com/FabMo/FabMo-Engine.git /fabmo
     cd /fabmo
@@ -161,6 +164,11 @@ setup_fabmo() {
     npm install
     echo "building fabmo-engine"
     npm run build 
+
+    # Verify and fix line endings for shell scripts
+    echo "Ensuring LF line endings for shell scripts..."
+    find /fabmo/files -type f -name "*.sh" -exec dos2unix {} \; 2>/dev/null || true
+    find /fabmo/files/network_conf_fabmo -type f -name "*.sh" -exec dos2unix {} \; 2>/dev/null || true
 
     echo "cloning fabmo-updater"
     git clone https://github.com/FabMo/FabMo-Updater.git /fabmo-updater
@@ -207,11 +215,24 @@ make_misc_tool_symlinks () {
     systemctl unmask hostapd
     systemctl daemon-reload
     systemctl enable hostapd
-    # Key dnsmasq configuration file (will not be updated with fabmo update)
-    install_file "$RESOURCE_DIR/dnsmasq/dnsmasq.conf" "/etc/dnsmasq.conf"
-    # Make sure we have the right permissions on this file, it is sensitive
-    chmod 755 /etc/dnsmasq.conf
 
+    # Key dnsmasq configuration files (will not be updated with fabmo update)
+    install_file "$RESOURCE_DIR/dnsmasq/dnsmasq.conf" "/etc/dnsmasq.conf"
+    chmod 755 /etc/dnsmasq.conf
+    
+    # Create dnsmasq.d directory if it doesn't exist
+    mkdir -p /etc/dnsmasq.d
+    chmod 755 /etc/dnsmasq.d
+    
+    # Install mode-specific dnsmasq configurations
+    install_file "$RESOURCE_DIR/dnsmasq/ap-only.conf" "/etc/dnsmasq.d/ap-only.conf"
+    install_file "$RESOURCE_DIR/dnsmasq/direct-mode.conf" "/etc/dnsmasq.d/direct-mode.conf"
+    chmod 644 /etc/dnsmasq.d/ap-only.conf
+    chmod 644 /etc/dnsmasq.d/direct-mode.conf
+    
+    # Set initial mode to ap-only (safer default - won't serve DHCP on LAN)
+    ln -sf /etc/dnsmasq.d/ap-only.conf /etc/dnsmasq.d/active-mode.conf
+    
     # Install setup-wlan0_ap service file, shell file now in fabmo/files/network_conf_fabmo
     install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
 
@@ -219,7 +240,7 @@ make_misc_tool_symlinks () {
     systemctl daemon-reload
     systemctl enable setup-wlan0_ap
     systemctl enable dnsmasq
-
+    
 # Create Sym-links for External FabMo Tools services
     sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_heat_volts.sh /usr/local/bin/ck_heat_volts
     sudo ln -sf $FABMO_RESOURCE_DIR/tools/ck_network.sh /usr/local/bin/ck_network
@@ -357,7 +378,8 @@ main_installation() {
     echo "-Delete this script and /resources from Scripts folder."
     echo "-? Set up rotation for small screen."
     echo ""
-    echo "-MAKE 8G COPY NOW, BEFORE FIRST BOOT"
+    echo ""
+    echo "-Now do final UI fussing then > MAKE 8G COPY, BEFORE FIRST BOOT"
     echo ""
     echo ""
 }
