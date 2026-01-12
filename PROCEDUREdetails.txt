@@ -1,5 +1,13 @@
 Procedure to make NEW RPi SD Card Image
 =======================================
+*NEW
+-fix screen message
+-use un-rotated version of fabmo logo splash
+-doc how to make smaller, not 8G but anything smaller (try 16G)
+-update version stuff
+-FabMo-Updater!
+---------------------------------------
+
 * EASIEST TO already HAVE A KEYBOARD AND TRACK PAD or MOUSE PLUGGED into Raspberry Pi when doing these things!
 {This is a semi-automated system using the latest standard OS from Raspberry Pi [see Instructions PART A] which is then modified for FabMo with a
    script that is run on a RPi [Instructions PART B].}
@@ -30,7 +38,8 @@ PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy wi
 4. Shut down the RPi correctly from: RPi(icon) > Logout > Shutdown [this is the only time I bother to shut down correctly]
 5. Remove this card, and bring the card back to PC.
 6. Use Win32Disk Imager to make the new "Working-OS-Image" SAVE THIS ==MASTER== FOR UPDATES ! (probably no need to change for months; this itself could be updated before a major release)
-
+    - using "Using only partitions with data" does not help size issue
+    
 FINAL THINGS to take care of here to make ready for part B.
   [ LAST IMAGE VERSION = 26-06]
 --UPDATE VERSION IN ==>   fabmo-release.txt (2 places in this file)    [this will go in /boot(where viewable from SD on Windows PC) and /etc] {{JUST INCREMENT THESE SEQUENTIALLY, no dev versions}}
@@ -44,6 +53,10 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
 7. Copy the "Working-OS-Image" to an SD-card, with Balena Etcher. THIS will now be the SD card FOR our FabMo-RPi-SD-Image BUILD !
 8. Boot up this card up on a Raspberry Pi (I have been using RPi5):
     - Go to Preferences > RPi COnfiguration > Interfaces > and turn SSH on if it is not (already is)
+
+8.5 Should I just put a temporary copy of this repo on the pi ???
+-trying it 1/11/26 ...
+
 9. Open up an ssh terminal connection (pi;shopbot), THEN DO:
     cd /home/pi
     sudo mkdir Scripts
@@ -65,8 +78,8 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
     - set Task Bar size, position: bottom, medium
     - set Desktop TEXT color to dark blue
     - Add RPI-CONNECT to Menu Bar; this is a bit awkward, but put on right side then move over to left
-    - Add squeekboard to right of time
-    - remove left side keyboard (now obsolete)
+    - Add squeekboard to right of time  ???
+    - remove left side keyboard (now obsolete) ???
     - Ck UPDATE of version file shows:  /etc/fabmo-release.txt
     
 
