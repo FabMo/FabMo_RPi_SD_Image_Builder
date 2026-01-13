@@ -130,3 +130,14 @@ Some details:
     *Note that modify-priorities and set-network-priorities are no longer being used
     *It is possible that a systemctl reload-daemon may be needed for symlinks whose content is altered! 
 
+NOTES FROM AI RE: above
+-----------------------------------------------------------------------------------------
+Summary Table
+File/Directory	                    Source Repo	      Managed By	Used In Build
+network-monitor.sh	                FabMo-Engine	FabMo updates	✅ Yes (symlinked)
+ip-reporting.py	                    FabMo-Engine	FabMo updates	✅ Yes (autostart)
+setup-wlan0_ap.service	            FabMo-Engine	FabMo updates	✅ Yes (installed)
+dnsmasq/*.conf	                       This repo	Image builds	✅ Yes (copied)
+hostapd/*	                           This repo	Image builds	✅ Yes (copied)
+NetworkManager/*	                   This repo	Image builds	✅ Yes (copied)
+resources/network_conf_fabmo/*	       REDUNDANT	❌ Unused	  ❌ No

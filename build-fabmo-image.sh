@@ -115,11 +115,10 @@ copy_all_files() {
     chmod 644 /etc/udev/rules.d/99-fabmo-usb.rules
 
     # Boot and User Interface Resources
-    install_file "$RESOURCE_DIR/FabMo-Icon-03-left.png" "/usr/share/plymouth/themes/pix/splash.png"
+    install_file "$RESOURCE_DIR/FabMo-Icon-03.png" "/usr/share/plymouth/themes/pix/splash.png"
     install_file "$RESOURCE_DIR/shopbot-pi-bkgnd.png" "/home/pi/Pictures/shopbot-pi-bkgnd.png"
     install_file "$RESOURCE_DIR/FabMo-Icon-03.png" "/home/pi/Pictures/FabMo-Icon-03.png"
     install_file "$RESOURCE_DIR/icon.png" "/home/pi/Pictures/icon.png"
-    install_file "$RESOURCE_DIR/ShopBot-Desktop-Icon-Transparent.png" "/home/pi/Pictures/ShopBot-Desktop-Icon-Transparent.png"
     plymouth-set-default-theme --rebuild-initrd pix
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/boot"
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/etc"
@@ -183,6 +182,10 @@ setup_fabmo() {
     #npm run start
     
     echo "installed fabmo-updater"
+
+    echo "cloning fabmo-def"
+    git clone https://github.com/FabMo/fabmo-def.git /fabmo-def
+    echo "done fabmo-def"
 
     echo "FabMo and Updater done ..."
     echo ""
@@ -373,13 +376,10 @@ main_installation() {
     echo ""
     echo ""
     echo "MANUAL STEPS NOW REQUIRED:"
-    echo "-Check to make sure expansion call is in /boot/firmware/cmdline.txt; last line should have init=/usr/lib/raspberrypi-sys-mods/firstboot"
-    echo "-Enable running from desktop in FileManager > Edit > Prefs (Don't ask options ...)."
-    echo "-Delete this script and /resources from Scripts folder."
-    echo "-? Set up rotation for small screen."
+    echo "-Delete this script and /resources from Scripts folder. Delete Image-Builder folder."
     echo ""
     echo ""
-    echo "-Now do final UI fussing then > MAKE 8G COPY, BEFORE FIRST BOOT"
+    echo "-Now do any final UI fussing then > MAKE 16G SD COPY on RPi, BEFORE FIRST Re-BOOT of this SD"
     echo ""
     echo ""
 }
