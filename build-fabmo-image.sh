@@ -377,7 +377,7 @@ main_installation() {
     echo ""
     echo "MANUAL STEPS NOW REQUIRED:"
     echo "-Delete this script and /resources from Scripts folder. Delete Image-Builder folder."
-    echo ""
+    echo "-Adjust bottom menu to Medium Desktop color to med-gray and dark-blue text  #353A92."
     echo ""
     echo "-Now do any final UI fussing then > MAKE 16G SD COPY on RPi, BEFORE FIRST Re-BOOT of this SD"
     echo ""

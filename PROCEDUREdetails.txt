@@ -86,7 +86,7 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
 
 
 14. DO NOT Reboot this card (e.g. as a test) if you want to make a small version as it seems to expand for the last time on the reboot (see cmd.txt init=)! 
-15. Make a copy of this SD card to a smaller SD card; 8G seems to work at the moment using SD Card Copier Accessory in RPi.
+15. Make a copy of this SD card to a smaller SD card; 16G seems to work at the moment using SD Card Copier Accessory in RPi. SDB?
 16. This SD card can now be used with the Win32Disk Imager (GOOGLE DOCS OFF) to make our NEW FabMo-RPi-Image
 
 17. Make a Zipped Copy of the NEW FabMo-RPi-Image for distribution and post.
