@@ -60,7 +60,7 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
     sudo git clone https://github.com/fabmo/FabMo_RPi_SD_Image_Builder Image_Builder
     Then:
     cd /home/pi
-    sudo mkdir Scripts
+    seems to already exist/// sudo mkdir Scripts
     (make this executable) sudo chmod +x Scripts
     [copy into this new folder (you can use WinSCP logged on as pi) from "Image_Builder" current local repo]:
 	    resources [folder]
