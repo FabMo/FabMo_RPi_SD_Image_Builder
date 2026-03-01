@@ -236,9 +236,6 @@ make_misc_tool_symlinks () {
     # Set initial mode to ap-only (safer default - won't serve DHCP on LAN)
     ln -sf /etc/dnsmasq.d/ap-only.conf /etc/dnsmasq.d/active-mode.conf
     
-    # Install setup-wlan0_ap service file, shell file now in fabmo/files/network_conf_fabmo
-    install_file "$FABMO_RESOURCE_DIR/network_conf_fabmo/setup-wlan0_ap.service" "/lib/systemd/system/setup-wlan0_ap.service"
-
     # enable all of these them
     systemctl daemon-reload
     systemctl enable setup-wlan0_ap
