@@ -1,21 +1,17 @@
 Procedure to make NEW RPi SD Card Image
 =======================================
 *NEW
--fix screen message
--use un-rotated version of fabmo logo splash
--doc how to make smaller, not 8G but anything smaller (try 16G)
--update version stuff
--FabMo-Updater!
+-clean screen for RPi-5
+
 ---------------------------------------
 
 * EASIEST TO already HAVE A KEYBOARD AND TRACK PAD or MOUSE PLUGGED into Raspberry Pi when doing these things!
 {This is a semi-automated system using the latest standard OS from Raspberry Pi [see Instructions PART A] which is then modified for FabMo with a
    script that is run on a RPi [Instructions PART B].}
 
-** SPEED OF ALL THE SD Copy, Compress, Uncompress processes seems to benefit from having a fresh boot of computer. Zipping the final file seems to take ~50min!
+** SPEED OF ALL THE SD Copy, Compress, Uncompress processes seems to benefit from having a fresh boot of computer. Zipping the final image file seems to take ~50min!
 
 PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy with we can just re-use for months)
-   ** Check out the new "sdm"? system to improve precustomization of this system and potentially get smaller zipped image for shipping **
 1. Download image from Raspi Foundation to PC [Current 64bit Desktop (w/o recommended software) Image] and save to a "build" folder.
     https://www.raspberrypi.com/software/operating-systems/#raspberry-pi-os-64-bit
     > NOW USING DESKTOP VERSION without recommended software TO KEEP SMALL for best zip
@@ -41,15 +37,16 @@ PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy wi
     - using "Using only partitions with data" does not help size issue
     
 FINAL THINGS to take care of here to make ready for part B.
-  [ LAST IMAGE VERSION = 26-06]
+-- YOU ARE DOING THIS in this repo and COMMITTING and PUSHING !!!
+  [ LAST IMAGE VERSION = 26-11]
 --UPDATE VERSION IN ==>   fabmo-release.txt (2 places in this file)    [this will go in /boot(where viewable from SD on Windows PC) and /etc] {{JUST INCREMENT THESE SEQUENTIALLY, no dev versions}}
---node versioning is done in Set up node.js of build-dabmo-image.sh in case it's version needs to be set ... *** tried setting to 18.x to match current dev but woud not install so went back to 16.x tho 18.19.0 after install
+--node versioning is done in Set up node.js of build-fabmo-image.sh in case it's version needs to be set ... *** tried setting to 18.x to match current dev but woud not install so went back to 16.x tho 18.19.0 after install
     **## NEED TO GET DEPENDENCIES UPDATED
 
 --check journalctl log size before doing this next time // see in notes in onenote
 
 
-PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Image)
+PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized Working-OS-Image from PART A)
 7. Copy the "Working-OS-Image" to an SD-card, with Balena Etcher. THIS will now be the SD card FOR our FabMo-RPi-SD-Image BUILD !
 8. Boot up this card up on a Raspberry Pi (I have been using RPi5):
     - Go to Preferences > RPi COnfiguration > Interfaces > and turn SSH on if it is not (already is)
@@ -86,7 +83,7 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded Working-OS-Imag
 
 
 14. DO NOT Reboot this card (e.g. as a test) if you want to make a small version as it seems to expand for the last time on the reboot (see cmd.txt init=)! 
-15. Make a copy of this SD card to a smaller SD card; 16G seems to work at the moment using SD Card Copier Accessory in RPi. SDB?
+15. Make a copy of this SD card to a smaller SD card; 16G seems to work at the moment using SD Card Copier Accessory in RPi.
 16. This SD card can now be used with the Win32Disk Imager (GOOGLE DOCS OFF) to make our NEW FabMo-RPi-Image
 
 17. Make a Zipped Copy of the NEW FabMo-RPi-Image for distribution and post.
@@ -126,7 +123,7 @@ Some details:
                        NetworkManager.conf    
 
 
-    *this LIST is INCOMPLETE ! finish ... 
+    *this LIST is INCOMPLETE and not up to date ! TODO!!! ... 
     *Note that modify-priorities and set-network-priorities are no longer being used
     *It is possible that a systemctl reload-daemon may be needed for symlinks whose content is altered! 
 

@@ -1,8 +1,8 @@
-v26.10
+v26.11
 OS VERSION
 PRETTY_NAME="ShopBot Tools FabMo Linux Release on Raspberry Pi OS"
 NAME="ShopBot Tools Digital Fabrication and Motion (FabMo) System"
-VERSION_NUMBER="26.10"
+VERSION_NUMBER="26.11"
 
 OS="12 kernel 6.???; Bookworm"
 HOME_URL="http://gofabmo.org/"
