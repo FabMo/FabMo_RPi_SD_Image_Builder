@@ -156,6 +156,10 @@ setup_fabmo() {
     # Ensure git respects LF line endings
     git config --global core.autocrlf input
 
+    echo "cloning fabmo-def"
+    git clone https://github.com/FabMo/fabmo-def.git /fabmo-def
+    echo "done fabmo-def"
+
     echo "cloning fabmo-engine"
     git clone https://github.com/FabMo/FabMo-Engine.git /fabmo
     cd /fabmo
@@ -182,10 +186,6 @@ setup_fabmo() {
     #npm run start
     
     echo "installed fabmo-updater"
-
-    echo "cloning fabmo-def"
-    git clone https://github.com/FabMo/fabmo-def.git /fabmo-def
-    echo "done fabmo-def"
 
     echo "FabMo and Updater done ..."
     echo ""
@@ -238,7 +238,6 @@ make_misc_tool_symlinks () {
     
     # enable all of these them
     systemctl daemon-reload
-    systemctl enable setup-wlan0_ap
     systemctl enable dnsmasq
     
 # Create Sym-links for External FabMo Tools services

@@ -78,7 +78,7 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized
     - Add RPI-CONNECT to Menu Bar; this is a bit awkward, but put on right side then move over to left
     - Add squeekboard to right of time  ???
     - remove left side keyboard (now obsolete) ???
-    - Ck UPDATE of version file shows:  /etc/fabmo-release.txt
+    - Ck UPDATE of version file shows:  /boot/fabmo-release.txt
     
 
 
