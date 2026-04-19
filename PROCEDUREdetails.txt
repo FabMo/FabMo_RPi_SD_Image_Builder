@@ -15,7 +15,7 @@ PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy wi
 1. Download image from Raspi Foundation to PC [Current 64bit Desktop (w/o recommended software) Image] and save to a "build" folder.
     https://www.raspberrypi.com/software/operating-systems/#raspberry-pi-os-64-bit
     > NOW USING DESKTOP VERSION without recommended software TO KEEP SMALL for best zip
-    ||Last: 2026-04-13-raspios-trixie-arm64.img.xz (and then updated to 4/18/25)
+    ||Last: 2026-04-13-raspios-bookworm-arm64.img.xz (and then updated to 4/18/25)  USED Legacy Bookworm ' latest and still maintained because Trixie seemed unstable from start
     ||My new computer (snapdragon) seems to require me to unzip before using Balena (I have not had to do that in the past)
 
 2. Use this image to create an initial SD-card using Balena Etcher. Do this on a 32G card now.
