@@ -70,15 +70,17 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized
 
 12. WHEN the script is finished running, check to make sure things got installed and permissions look right.
 
-13. Then do additional current little fixes:
-    -REMOVE THE BUILD SCRIPT AND RESOURCES as well as the TEMP Repo 
-    -size bottom bar to medium
-    - set Task Bar size, position: bottom, medium
-    - set Desktop TEXT color to dark blue #353A92 ???
-    - Add RPI-CONNECT to Menu Bar; this is a bit awkward, but put on right side then move over to left
-    - Add squeekboard to right of time  ???
-    - remove left side keyboard (now obsolete) ???
-    - Ck UPDATE of version file shows:  /boot/fabmo-release.txt
+13. Run cleanup script and do additional UI adjustments:
+    -Run cleanup:  sudo /home/pi/Scripts/cleanup-build.sh
+       (This removes BUILD SCRIPT, RESOURCES, and TEMP Repo automatically)
+    -UI Adjustments:
+       * Set Task Bar: position bottom, size medium
+       * Set Desktop text color to dark blue #353A92
+       * Add RPI-CONNECT to Menu Bar (add on right, then move to left side)
+    -Verify version file:  cat /boot/fabmo-release.txt
+    
+    NOTE: The boot sequence has been optimized for RPi 5 to show FabMo logo cleanly
+          without scrolled instructions or excessive black screen.
     
 
 

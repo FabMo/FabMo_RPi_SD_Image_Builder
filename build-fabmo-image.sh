@@ -74,16 +74,25 @@ setup_system() {
     apt-get install -y npm
     echo "npm installed."
 
-    # Bookworm version ... dealing with initialization screens
-    echo "Setting up screens ..."
+    # Bookworm version ... dealing with initialization screens for clean boot
+    echo "Setting up screens for clean boot experience..."
+    
+    # Configure config.txt for RPi 5 clean boot
     if ! grep -q "^disable_splash=1" /boot/firmware/config.txt; then
         echo "disable_splash=1" >> /boot/firmware/config.txt
     fi
-    if ! grep -q "quiet" /boot/firmware/cmdline.txt; then
-        sed -i '1 s/$/ quiet/' /boot/firmware/cmdline.txt
+    # Disable firmware warnings overlay (removes overlays like low voltage warnings during boot)
+    if ! grep -q "^avoid_warnings=1" /boot/firmware/config.txt; then
+        echo "avoid_warnings=1" >> /boot/firmware/config.txt
     fi
-    if ! grep -q "splash" /boot/firmware/cmdline.txt; then
-        sed -i '1 s/$/ splash/' /boot/firmware/cmdline.txt
+    
+    # Add comprehensive boot parameters for clean display on RPi 5
+    # Remove any existing quiet/splash/loglevel params first to avoid duplicates
+    sed -i'' -e 's/ quiet//g; s/ splash//g; s/ loglevel=[0-9]//g; s/ logo\.nologo//g; s/ vt\.global_cursor_default=[0-9]//g; s/ console=tty[0-9]//g' /boot/firmware/cmdline.txt
+    
+    # Add all boot parameters for suppressing console messages and showing splash
+    if ! grep -q "quiet" /boot/firmware/cmdline.txt; then
+        sed -i '1 s/$/ quiet loglevel=0 logo.nologo vt.global_cursor_default=0 console=tty3 splash plymouth.ignore-serial-consoles/' /boot/firmware/cmdline.txt
     fi
 
     # to get the firstboot expansion to run on the next boot; also a line in the config.txt for this that must be in place
@@ -109,6 +118,8 @@ copy_all_files() {
     mkdir -p /home/pi/Scripts
     install_file "$RESOURCE_DIR/fabmo.bashrc" "/home/pi/.bashrc"
     install_file "$RESOURCE_DIR/dev-build.sh" "/home/pi/Scripts"
+    install_file "$RESOURCE_DIR/cleanup-build.sh" "/home/pi/Scripts"
+    chmod +x /home/pi/Scripts/cleanup-build.sh
 
     # Key USB symlink file for FabMo-G2 and VFD USB devices
     install_file "$RESOURCE_DIR/99-fabmo-usb.rules" "/etc/udev/rules.d/"
@@ -119,7 +130,22 @@ copy_all_files() {
     install_file "$RESOURCE_DIR/shopbot-pi-bkgnd.png" "/home/pi/Pictures/shopbot-pi-bkgnd.png"
     install_file "$RESOURCE_DIR/FabMo-Icon-03.png" "/home/pi/Pictures/FabMo-Icon-03.png"
     install_file "$RESOURCE_DIR/icon.png" "/home/pi/Pictures/icon.png"
+    
+    # Configure Plymouth for longer splash display and smooth boot
     plymouth-set-default-theme --rebuild-initrd pix
+    
+    # Configure Plymouth to show splash longer and suppress messages
+    mkdir -p /etc/plymouth
+    cat > /etc/plymouth/plymouthd.conf <<EOF
+[Daemon]
+Theme=pix
+ShowDelay=0
+DeviceTimeout=8
+EOF
+    
+    # Update initramfs to apply Plymouth changes
+    update-initramfs -u
+    
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/boot"
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/etc"
 
@@ -367,15 +393,21 @@ main_installation() {
     some_extras
 
     echo ""
-
-    echo "BUILD, Installation, and Configuration Complete. ==============(remove BUILD files?)===="
+    echo "BUILD, Installation, and Configuration Complete. ============================================"
     echo ""
     echo ""
     echo "MANUAL STEPS NOW REQUIRED:"
-    echo "-Delete this script and /resources from Scripts folder. Delete Image-Builder folder."
-    echo "-Adjust bottom menu to Medium Desktop color to med-gray and dark-blue text  #353A92."
+    echo "1. Run cleanup script: sudo /home/pi/Scripts/cleanup-build.sh"
+    echo "   (Removes build files, resources, and temp repo)"
+    echo "2. UI Adjustments:"
+    echo "   - Set Task Bar: bottom, medium size"
+    echo "   - Set Desktop text color to #353A92 (dark blue)"
+    echo "   - Add RPI-CONNECT to Menu Bar"
+    echo "3. Verify: cat /boot/fabmo-release.txt"
     echo ""
-    echo "-Now do any final UI fussing then > MAKE 16G SD COPY on RPi, BEFORE FIRST Re-BOOT of this SD"
+    echo "4. MAKE 16G SD COPY on RPi BEFORE FIRST REBOOT (prevents expansion)"
+    echo ""
+    echo "NOTE: Boot display optimized for RPi 5 - clean FabMo logo, no scrolling messages"
     echo ""
     echo ""
 }
