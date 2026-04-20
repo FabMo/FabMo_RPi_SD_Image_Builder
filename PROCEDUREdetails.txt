@@ -69,6 +69,8 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized
 	                sudo ./build-fabmo-image.sh
 
 12. WHEN the script is finished running, check to make sure things got installed and permissions look right.
+    -Run boot diagnostic:  /home/pi/Scripts/check-boot-config.sh
+       (This checks that all RPi 5 boot display settings are correctly applied)
 
 13. Run cleanup script and do additional UI adjustments:
     -Run cleanup:  sudo /home/pi/Scripts/cleanup-build.sh
@@ -79,12 +81,18 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized
        * Add RPI-CONNECT to Menu Bar (add on right, then move to left side)
     -Verify version file:  cat /boot/fabmo-release.txt
     
-    NOTE: The boot sequence has been optimized for RPi 5 to show FabMo logo cleanly
-          without scrolled instructions or excessive black screen.
+    NOTE: The boot sequence has been optimized for RPi 5:
+          - Rainbow splash disabled (disable_fw_kms_setup=1)
+          - FabMo logo shows for ~3-5 seconds via Plymouth
+          - No scrolling console text (quiet loglevel=3, console=tty3)
+          - Boot parameters are automatically restored after firstboot expansion
+          - If boot display issues persist, check /boot/firmware/config.txt and cmdline.txt
     
 
 
-14. DO NOT Reboot this card (e.g. as a test) if you want to make a small version as it seems to expand for the last time on the reboot (see cmd.txt init=)! 
+14. DO NOT Reboot this card (e.g. as a test) if you want to make a small version as it seems to expand for the last time on the reboot (see cmd.txt init=)!
+    IMPORTANT: The firstboot script will rewrite cmdline.txt on first expansion. The restore-boot-params.service 
+               will automatically restore boot display settings on the next boot. 
 15. Make a copy of this SD card to a smaller SD card; 16G seems to work at the moment using SD Card Copier Accessory in RPi.
 16. This SD card can now be used with the Win32Disk Imager (GOOGLE DOCS OFF) to make our NEW FabMo-RPi-Image
 

@@ -41,7 +41,7 @@ install_packages_and_configure() {
     wait_for_dpkg_lock
     echo "Updating package lists..."
     apt-get update
-    apt-get install -y bossa-cli hostapd dnsmasq xserver-xorg-input-libinput pi-package jackd2 python3-pyudev python3-tornado wvkbd dos2unix
+    apt-get install -y bossa-cli hostapd dnsmasq xserver-xorg-input-libinput pi-package jackd2 python3-pyudev python3-tornado wvkbd dos2unix plymouth plymouth-themes
     # Preconfigure jackd2 (audio) to allow real-time process priority
     debconf-set-selections <<< "jackd2 jackd/tweak_rt_limits boolean true"
     echo "Packages installed."
@@ -74,31 +74,57 @@ setup_system() {
     apt-get install -y npm
     echo "npm installed."
 
-    # Bookworm version ... dealing with initialization screens for clean boot
-    echo "Setting up screens for clean boot experience..."
+    # Bookworm version ... dealing with initialization screens for clean boot on RPi 5
+    echo "Setting up screens for clean boot experience (RPi 5 optimized)..."
     
     # Configure config.txt for RPi 5 clean boot
-    if ! grep -q "^disable_splash=1" /boot/firmware/config.txt; then
-        echo "disable_splash=1" >> /boot/firmware/config.txt
+    # RPi 5 requires different splash handling - disable the rainbow splash
+    if ! grep -q "^disable_fw_kms_setup=1" /boot/firmware/config.txt; then
+        echo "disable_fw_kms_setup=1" >> /boot/firmware/config.txt
     fi
-    # Disable firmware warnings overlay (removes overlays like low voltage warnings during boot)
+    # Disable overscan black borders
+    if ! grep -q "^disable_overscan=1" /boot/firmware/config.txt; then
+        echo "disable_overscan=1" >> /boot/firmware/config.txt
+    fi
+    # Disable firmware warnings overlay
     if ! grep -q "^avoid_warnings=1" /boot/firmware/config.txt; then
         echo "avoid_warnings=1" >> /boot/firmware/config.txt
     fi
     
     # Add comprehensive boot parameters for clean display on RPi 5
     # Remove any existing quiet/splash/loglevel params first to avoid duplicates
-    sed -i'' -e 's/ quiet//g; s/ splash//g; s/ loglevel=[0-9]//g; s/ logo\.nologo//g; s/ vt\.global_cursor_default=[0-9]//g; s/ console=tty[0-9]//g' /boot/firmware/cmdline.txt
+    sed -i'' -e 's/ quiet//g; s/ splash//g; s/ loglevel=[0-9]//g; s/ logo\.nologo//g; s/ vt\.global_cursor_default=[0-9]//g; s/ console=tty[0-9]//g; s/ plymouth\.ignore-serial-consoles//g' /boot/firmware/cmdline.txt
     
-    # Add all boot parameters for suppressing console messages and showing splash
+    # Add all boot parameters for suppressing console messages and showing Plymouth splash
     if ! grep -q "quiet" /boot/firmware/cmdline.txt; then
-        sed -i '1 s/$/ quiet loglevel=0 logo.nologo vt.global_cursor_default=0 console=tty3 splash plymouth.ignore-serial-consoles/' /boot/firmware/cmdline.txt
+        sed -i '1 s/$/ quiet loglevel=3 logo.nologo vt.global_cursor_default=0 console=tty3 splash plymouth.ignore-serial-consoles/' /boot/firmware/cmdline.txt
     fi
 
     # to get the firstboot expansion to run on the next boot; also a line in the config.txt for this that must be in place
     if ! grep -q "init=/usr/lib/raspberrypi-sys-mods/firstboot" /boot/firmware/cmdline.txt; then
         sed -i'' -e '1 s/$/ init=\/usr\/lib\/raspberrypi-sys-mods\/firstboot/' /boot/firmware/cmdline.txt
     fi
+    
+    # CRITICAL: Create a systemd service to restore boot parameters after firstboot completes
+    # The firstboot script rewrites cmdline.txt and strips our parameters
+    cat > /etc/systemd/system/restore-boot-params.service <<EOF
+[Unit]
+Description=Restore FabMo Boot Display Parameters After Firstboot
+DefaultDependencies=no
+After=local-fs.target
+ConditionPathExists=!/var/lib/fabmo-boot-params-restored
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'if ! grep -q "logo.nologo" /boot/firmware/cmdline.txt; then sed -i "1 s/\$/ quiet loglevel=3 logo.nologo vt.global_cursor_default=0 console=tty3 splash plymouth.ignore-serial-consoles/" /boot/firmware/cmdline.txt; fi'
+ExecStart=/bin/touch /var/lib/fabmo-boot-params-restored
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target
+EOF
+    
+    systemctl enable restore-boot-params.service
 
     echo "System Configurations set."
     echo ""
@@ -120,6 +146,8 @@ copy_all_files() {
     install_file "$RESOURCE_DIR/dev-build.sh" "/home/pi/Scripts"
     install_file "$RESOURCE_DIR/cleanup-build.sh" "/home/pi/Scripts"
     chmod +x /home/pi/Scripts/cleanup-build.sh
+    install_file "$RESOURCE_DIR/check-boot-config.sh" "/home/pi/Scripts"
+    chmod +x /home/pi/Scripts/check-boot-config.sh
 
     # Key USB symlink file for FabMo-G2 and VFD USB devices
     install_file "$RESOURCE_DIR/99-fabmo-usb.rules" "/etc/udev/rules.d/"
@@ -132,7 +160,8 @@ copy_all_files() {
     install_file "$RESOURCE_DIR/icon.png" "/home/pi/Pictures/icon.png"
     
     # Configure Plymouth for longer splash display and smooth boot
-    plymouth-set-default-theme --rebuild-initrd pix
+    # First set the theme
+    plymouth-set-default-theme pix
     
     # Configure Plymouth to show splash longer and suppress messages
     mkdir -p /etc/plymouth
@@ -140,10 +169,29 @@ copy_all_files() {
 [Daemon]
 Theme=pix
 ShowDelay=0
-DeviceTimeout=8
+DeviceTimeout=30
 EOF
     
-    # Update initramfs to apply Plymouth changes
+    # Create systemd service to hold Plymouth visible longer during boot
+    cat > /etc/systemd/system/plymouth-wait.service <<EOF
+[Unit]
+Description=Keep Plymouth Splash Visible
+DefaultDependencies=no
+After=plymouth-start.service
+Before=plymouth-quit.service display-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sleep 3
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target
+EOF
+    
+    systemctl enable plymouth-wait.service
+    
+    # Rebuild initramfs to apply Plymouth changes
     update-initramfs -u
     
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/boot"
@@ -397,17 +445,19 @@ main_installation() {
     echo ""
     echo ""
     echo "MANUAL STEPS NOW REQUIRED:"
-    echo "1. Run cleanup script: sudo /home/pi/Scripts/cleanup-build.sh"
+    echo "1. Verify boot configuration: /home/pi/Scripts/check-boot-config.sh"
+    echo "2. Run cleanup script: sudo /home/pi/Scripts/cleanup-build.sh"
     echo "   (Removes build files, resources, and temp repo)"
-    echo "2. UI Adjustments:"
+    echo "3. UI Adjustments:"
     echo "   - Set Task Bar: bottom, medium size"
     echo "   - Set Desktop text color to #353A92 (dark blue)"
     echo "   - Add RPI-CONNECT to Menu Bar"
-    echo "3. Verify: cat /boot/fabmo-release.txt"
+    echo "4. Verify: cat /boot/fabmo-release.txt"
     echo ""
-    echo "4. MAKE 16G SD COPY on RPi BEFORE FIRST REBOOT (prevents expansion)"
+    echo "5. MAKE 16G SD COPY on RPi BEFORE FIRST REBOOT (prevents expansion)"
     echo ""
     echo "NOTE: Boot display optimized for RPi 5 - clean FabMo logo, no scrolling messages"
+    echo "      Run check-boot-config.sh to verify all settings"
     echo ""
     echo ""
 }
