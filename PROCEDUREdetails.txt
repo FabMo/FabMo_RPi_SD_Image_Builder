@@ -71,6 +71,8 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized
 12. WHEN the script is finished running, check to make sure things got installed and permissions look right.
     -Run boot diagnostic:  /home/pi/Scripts/check-boot-config.sh
        (This checks that all RPi 5 boot display settings are correctly applied)
+    -If boot display or login issues occur, run: sudo /home/pi/Scripts/fix-cold-boot-and-login.sh
+       (This fixes cold boot console and restores auto-login)
 
 13. Run cleanup script and do additional UI adjustments:
     -Run cleanup:  sudo /home/pi/Scripts/cleanup-build.sh
@@ -81,18 +83,25 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized
        * Add RPI-CONNECT to Menu Bar (add on right, then move to left side)
     -Verify version file:  cat /boot/fabmo-release.txt
     
-    NOTE: The boot sequence has been optimized for RPi 5:
-          - Rainbow splash disabled (disable_fw_kms_setup=1)
-          - FabMo logo shows for ~3-5 seconds via Plymouth
-          - No scrolling console text (quiet loglevel=3, console=tty3)
-          - Boot parameters are automatically restored after firstboot expansion
-          - If boot display issues persist, check /boot/firmware/config.txt and cmdline.txt
+    NOTE: The boot sequence has been optimized for RPi 5 (both cold and warm boots):
+          - **CRITICAL FIX**: Network Install UI disabled in EEPROM (NET_INSTALL_AT_POWER_ON=0)
+            This was the actual cause of the white/red screen on cold boot
+          - Rainbow splash disabled (disable_fw_kms_setup=1 in config.txt)
+          - Firmware splash disabled (disable_splash=1)
+          - Boot delay minimized (boot_delay=0 for faster cold boot)
+          - FabMo logo displays via Plymouth for ~3-5 seconds
+          - Console suppressed (loglevel=3, console=tty3)
+          - Boot parameters maintained by fabmo-boot-params.service
+          - Auto-login configured for user pi (no login prompt)
+          - Works consistently on both power-on (cold) and reboot (warm)
+          - You should NEVER see white/red network install screen
+          - You should NEVER see a login prompt
     
 
 
 14. DO NOT Reboot this card (e.g. as a test) if you want to make a small version as it seems to expand for the last time on the reboot (see cmd.txt init=)!
-    IMPORTANT: The firstboot script will rewrite cmdline.txt on first expansion. The restore-boot-params.service 
-               will automatically restore boot display settings on the next boot. 
+    IMPORTANT: The firstboot script will rewrite cmdline.txt on first expansion, but the fabmo-boot-params.service 
+               will automatically restore boot display settings on every boot to prevent issues. 
 15. Make a copy of this SD card to a smaller SD card; 16G seems to work at the moment using SD Card Copier Accessory in RPi.
 16. This SD card can now be used with the Win32Disk Imager (GOOGLE DOCS OFF) to make our NEW FabMo-RPi-Image
 

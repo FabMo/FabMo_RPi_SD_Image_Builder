@@ -77,10 +77,18 @@ setup_system() {
     # Bookworm version ... dealing with initialization screens for clean boot on RPi 5
     echo "Setting up screens for clean boot experience (RPi 5 optimized)..."
     
-    # Configure config.txt for RPi 5 clean boot
+    # Configure config.txt for RPi 5 clean boot - especially for cold boot (power-on)
     # RPi 5 requires different splash handling - disable the rainbow splash
     if ! grep -q "^disable_fw_kms_setup=1" /boot/firmware/config.txt; then
         echo "disable_fw_kms_setup=1" >> /boot/firmware/config.txt
+    fi
+    # Disable the firmware splash screen (critical for cold boot)
+    if ! grep -q "^disable_splash=1" /boot/firmware/config.txt; then
+        echo "disable_splash=1" >> /boot/firmware/config.txt
+    fi
+    # Minimize boot delay to start kernel/Plymouth faster
+    if ! grep -q "^boot_delay=0" /boot/firmware/config.txt; then
+        echo "boot_delay=0" >> /boot/firmware/config.txt
     fi
     # Disable overscan black borders
     if ! grep -q "^disable_overscan=1" /boot/firmware/config.txt; then
@@ -93,9 +101,10 @@ setup_system() {
     
     # Add comprehensive boot parameters for clean display on RPi 5
     # Remove any existing quiet/splash/loglevel params first to avoid duplicates
-    sed -i'' -e 's/ quiet//g; s/ splash//g; s/ loglevel=[0-9]//g; s/ logo\.nologo//g; s/ vt\.global_cursor_default=[0-9]//g; s/ console=tty[0-9]//g; s/ plymouth\.ignore-serial-consoles//g' /boot/firmware/cmdline.txt
+    sed -i'' -e 's/ quiet//g; s/ splash//g; s/ loglevel=[0-9]//g; s/ logo\.nologo//g; s/ vt\.global_cursor_default=[0-9]//g; s/ console=tty[0-9]//g; s/ plymouth\.ignore-serial-consoles//g; s/ consoleblank=[0-9]//g' /boot/firmware/cmdline.txt
     
     # Add all boot parameters for suppressing console messages and showing Plymouth splash
+    # For clean boot with reasonable error visibility
     if ! grep -q "quiet" /boot/firmware/cmdline.txt; then
         sed -i '1 s/$/ quiet loglevel=3 logo.nologo vt.global_cursor_default=0 console=tty3 splash plymouth.ignore-serial-consoles/' /boot/firmware/cmdline.txt
     fi
@@ -105,28 +114,71 @@ setup_system() {
         sed -i'' -e '1 s/$/ init=\/usr\/lib\/raspberrypi-sys-mods\/firstboot/' /boot/firmware/cmdline.txt
     fi
     
-    # CRITICAL: Create a systemd service to restore boot parameters after firstboot completes
-    # The firstboot script rewrites cmdline.txt and strips our parameters
-    cat > /etc/systemd/system/restore-boot-params.service <<EOF
+    # CRITICAL: Create a boot parameter enforcement script
+    # The firstboot script and other processes can strip our parameters
+    cat > /usr/local/bin/ensure-fabmo-boot-params.sh <<'EOF'
+#!/bin/bash
+# Ensure FabMo boot display parameters are always present
+
+CMDLINE_FILE="/boot/firmware/cmdline.txt"
+REQUIRED_PARAMS="quiet loglevel=3 logo.nologo vt.global_cursor_default=0 console=tty3 splash plymouth.ignore-serial-consoles"
+
+# Read current cmdline
+CURRENT=$(cat "$CMDLINE_FILE")
+
+# Check if all required params are present
+NEEDS_UPDATE=0
+for PARAM in $REQUIRED_PARAMS; do
+    if [[ ! "$CURRENT" =~ $PARAM ]]; then
+        NEEDS_UPDATE=1
+        break
+    fi
+done
+
+# Update if needed
+if [ $NEEDS_UPDATE -eq 1 ]; then
+    echo "FabMo boot parameters missing, restoring..."
+    # Remove any existing instances first to avoid duplicates
+    sed -i 's/ quiet//g; s/ splash//g; s/ loglevel=[0-9]//g; s/ logo\.nologo//g; s/ vt\.global_cursor_default=[0-9]//g; s/ console=tty[0-9]//g; s/ plymouth\.ignore-serial-consoles//g' "$CMDLINE_FILE"
+    # Add them back
+    sed -i "1 s/\$/ $REQUIRED_PARAMS/" "$CMDLINE_FILE"
+    echo "Boot parameters restored."
+    # Ensure initramfs is current
+    update-initramfs -u -k all
+fi
+EOF
+    
+    chmod +x /usr/local/bin/ensure-fabmo-boot-params.sh
+    
+    # Create a systemd service that runs EARLY and on every boot
+    cat > /etc/systemd/system/fabmo-boot-params.service <<EOF
 [Unit]
-Description=Restore FabMo Boot Display Parameters After Firstboot
+Description=Ensure FabMo Boot Display Parameters
 DefaultDependencies=no
 After=local-fs.target
-ConditionPathExists=!/var/lib/fabmo-boot-params-restored
+Before=plymouth-start.service systemd-user-sessions.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c 'if ! grep -q "logo.nologo" /boot/firmware/cmdline.txt; then sed -i "1 s/\$/ quiet loglevel=3 logo.nologo vt.global_cursor_default=0 console=tty3 splash plymouth.ignore-serial-consoles/" /boot/firmware/cmdline.txt; fi'
-ExecStart=/bin/touch /var/lib/fabmo-boot-params-restored
+ExecStart=/usr/local/bin/ensure-fabmo-boot-params.sh
 RemainAfterExit=yes
 
 [Install]
 WantedBy=sysinit.target
 EOF
     
-    systemctl enable restore-boot-params.service
+    systemctl enable fabmo-boot-params.service
 
     echo "System Configurations set."
+    echo ""
+    
+    # CRITICAL FIX for RPi 5 white/red screen on cold boot
+    # Newer RPi 5 boards have NET_INSTALL_AT_POWER_ON=1 in EEPROM by default
+    # This shows "Install an OS" / Network Install UI on every cold power-up
+    # Disable it to prevent white/red console screen
+    echo "Disabling network install UI in EEPROM..."
+    raspi-config nonint do_net_install 1  # 1 = disable
+    echo "Network install UI disabled."
     echo ""
 }
 
@@ -148,6 +200,12 @@ copy_all_files() {
     chmod +x /home/pi/Scripts/cleanup-build.sh
     install_file "$RESOURCE_DIR/check-boot-config.sh" "/home/pi/Scripts"
     chmod +x /home/pi/Scripts/check-boot-config.sh
+    install_file "$RESOURCE_DIR/fix-boot-display-rpi5.sh" "/home/pi/Scripts"
+    chmod +x /home/pi/Scripts/fix-boot-display-rpi5.sh
+    install_file "$RESOURCE_DIR/fix-cold-boot-and-login.sh" "/home/pi/Scripts"
+    chmod +x /home/pi/Scripts/fix-cold-boot-and-login.sh
+    install_file "$RESOURCE_DIR/quick-fix-cold-boot.sh" "/home/pi/Scripts"
+    chmod +x /home/pi/Scripts/quick-fix-cold-boot.sh
 
     # Key USB symlink file for FabMo-G2 and VFD USB devices
     install_file "$RESOURCE_DIR/99-fabmo-usb.rules" "/etc/udev/rules.d/"
@@ -191,8 +249,30 @@ EOF
     
     systemctl enable plymouth-wait.service
     
-    # Rebuild initramfs to apply Plymouth changes
-    update-initramfs -u
+    # Ensure auto-login is configured (don't mask getty, it breaks auto-login)
+    # Configure LightDM for auto-login as user pi
+    mkdir -p /etc/lightdm/lightdm.conf.d
+    cat > /etc/lightdm/lightdm.conf.d/22-autologin.conf <<EOF
+[Seat:*]
+autologin-user=pi
+autologin-user-timeout=0
+EOF
+    
+    # Ensure Plymouth takes priority over console
+    # Modify getty to not clear screen and delay start
+    mkdir -p /etc/systemd/system/getty@tty1.service.d
+    cat > /etc/systemd/system/getty@tty1.service.d/override.conf <<EOF
+[Unit]
+# Start getty late, after Plymouth has had time to display
+After=plymouth-quit-wait.service
+
+[Service]
+# Don't clear the screen
+TTYVTDisallocate=no
+EOF
+    
+    # Rebuild initramfs to apply Plymouth changes - do this AFTER all Plymouth config
+    update-initramfs -u -k all
     
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/boot"
     install_file "$RESOURCE_DIR/fabmo-release.txt" "/etc"

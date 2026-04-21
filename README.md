@@ -1,6 +1,25 @@
 # FabMo_RPi_SD_Image_Builder
- Semi-automated SD-Image Maker for FabMo
+Semi-automated SD-Image Maker for FabMo
 
+## Important Notes
+
+### RPi 5 Boot Display Fix (April 2026)
+
+**Issue**: Newer 8GB RPi 5 boards show white/red "Install an OS" screen on cold boot (power-on).
+
+**Cause**: Factory EEPROM has `NET_INSTALL_AT_POWER_ON=1` enabled by default.
+
+**Fix**: Disable network install UI in EEPROM:
+```bash
+sudo raspi-config
+# Navigate to: Advanced Options → Network Install UI → Disable
+```
+
+This is now automated in `build-fabmo-image.sh`. See [BOOT_FIX_SUMMARY.md](BOOT_FIX_SUMMARY.md) for technical details.
+
+---
+
+### OS Version Selection (April 2026)
 
 4_19_26 Difficult initializing "Trixie" first try so switched to legacy, but still supported bookworm for build today. Here is chatter with Perplexity.
 
