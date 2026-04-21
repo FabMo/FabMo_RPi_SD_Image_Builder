@@ -84,8 +84,6 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized
     -Verify version file:  cat /boot/fabmo-release.txt
     
     NOTE: The boot sequence has been optimized for RPi 5 (both cold and warm boots):
-          - **CRITICAL FIX**: Network Install UI disabled in EEPROM (NET_INSTALL_AT_POWER_ON=0)
-            This was the actual cause of the white/red screen on cold boot
           - Rainbow splash disabled (disable_fw_kms_setup=1 in config.txt)
           - Firmware splash disabled (disable_splash=1)
           - Boot delay minimized (boot_delay=0 for faster cold boot)
@@ -94,8 +92,19 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized
           - Boot parameters maintained by fabmo-boot-params.service
           - Auto-login configured for user pi (no login prompt)
           - Works consistently on both power-on (cold) and reboot (warm)
-          - You should NEVER see white/red network install screen
           - You should NEVER see a login prompt
+    
+    IMPORTANT - RPi 5 EEPROM Configuration (Per-Board, Not Per-Image):
+          Newer RPi 5 boards (especially 8GB models) may show a white/red "Install an OS" 
+          screen on first cold boot. This is a board EEPROM setting, not an SD card issue.
+          
+          TO FIX (one-time per board):
+          1. After first boot completes, run: sudo raspi-config
+          2. Navigate to: Advanced Options → Network Install UI → Disable
+          3. Reboot - white/red screen should be gone permanently
+          
+          This setting is stored in the board's hardware EEPROM, so it only needs to be 
+          done once per physical board, not every time you flash a new image.
     
 
 
@@ -106,6 +115,38 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized
 16. This SD card can now be used with the Win32Disk Imager (GOOGLE DOCS OFF) to make our NEW FabMo-RPi-Image
 
 17. Make a Zipped Copy of the NEW FabMo-RPi-Image for distribution and post.
+
+
+
+=======================================
+POST-INSTALLATION NOTES FOR END USERS
+=======================================
+
+When distributing the FabMo image, include these instructions for first-time setup:
+
+** FOR RPi 5 BOARDS (especially 8GB models) **
+
+If you see a white/red screen with "Install an OS" text on first boot:
+  1. Wait for boot to complete (may take 2-3 minutes)
+  2. Once desktop appears, open Terminal
+  3. Run: sudo raspi-config
+  4. Navigate to: Advanced Options → Network Install UI → Disable
+  5. Exit and reboot
+  6. White/red screen should be gone permanently
+
+This is a one-time hardware configuration (stored in board EEPROM, not on SD card).
+Older RPi 5 boards may not have this issue.
+
+** EXPECTED BOOT SEQUENCE (after EEPROM fix if needed) **
+  - Black screen (1-2 seconds)
+  - FabMo logo (3-5 seconds)
+  - ShopBot desktop (auto-login, no password prompt)
+
+
+** DISTRIBUTION PACKAGE **
+
+Include FIRST_BOOT_SETUP.txt with the zipped image file for end-user reference.
+This file provides simple instructions for the EEPROM configuration if needed.
 
 
 

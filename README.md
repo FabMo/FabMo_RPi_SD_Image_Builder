@@ -3,19 +3,22 @@ Semi-automated SD-Image Maker for FabMo
 
 ## Important Notes
 
-### RPi 5 Boot Display Fix (April 2026)
+### RPi 5 Boot Display - EEPROM Configuration (Post-Installation)
 
-**Issue**: Newer 8GB RPi 5 boards show white/red "Install an OS" screen on cold boot (power-on).
+**Issue**: Newer 8GB RPi 5 boards may show a white/red "Install an OS" screen on first boot.
 
-**Cause**: Factory EEPROM has `NET_INSTALL_AT_POWER_ON=1` enabled by default.
+**Cause**: Factory EEPROM has `NET_INSTALL_AT_POWER_ON=1` enabled by default (board hardware setting, not SD card).
 
-**Fix**: Disable network install UI in EEPROM:
+**Fix** (one-time per board, after flashing image):
 ```bash
 sudo raspi-config
 # Navigate to: Advanced Options → Network Install UI → Disable
+# Reboot
 ```
 
-This is now automated in `build-fabmo-image.sh`. See [BOOT_FIX_SUMMARY.md](BOOT_FIX_SUMMARY.md) for technical details.
+**Important**: This setting is stored in the board's EEPROM hardware, not on the SD card. Each physical board needs this configuration once, but it persists across SD card swaps and re-flashes.
+
+See [BOOT_FIX_SUMMARY.md](BOOT_FIX_SUMMARY.md) for technical details.
 
 ---
 

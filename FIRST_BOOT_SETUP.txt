@@ -1,0 +1,56 @@
+================================================================================
+FabMo RPi Image - First Boot Setup for Raspberry Pi 5
+================================================================================
+
+IMPORTANT: Raspberry Pi 5 EEPROM Configuration
+-----------------------------------------------
+
+If you see a WHITE/RED SCREEN with "Install an OS" text on your first boot:
+
+  This is normal on newer RPi 5 boards (especially 8GB models).
+  It's a hardware setting in the board's EEPROM, not an SD card issue.
+
+TO FIX (one-time setup):
+  1. Wait for the white/red screen to complete (2-3 minutes)
+  2. Desktop will appear with auto-login
+  3. Open Terminal (from menu bar)
+  4. Run this command:
+     
+     sudo raspi-config
+
+  5. Navigate using arrow keys:
+     Advanced Options → Network Install UI → Disable
+  
+  6. Exit raspi-config and reboot
+  7. White/red screen will be gone permanently
+
+This configuration is stored in the board's hardware and persists across 
+SD card swaps. You only need to do this ONCE per physical Raspberry Pi.
+
+================================================================================
+
+Expected Boot Sequence (after EEPROM fix):
+  
+  1. Black screen (1-2 seconds)
+  2. FabMo logo (3-5 seconds)  
+  3. ShopBot desktop appears automatically (no login required)
+
+================================================================================
+
+Technical Note:
+  
+  The white/red screen is RPi 5's "Network Install UI" feature, intended to 
+  help novice users install an OS on a blank SD card. It's enabled by default 
+  in the factory EEPROM on boards manufactured after mid-2024.
+  
+  Setting name: NET_INSTALL_AT_POWER_ON=1 (factory default)
+  After fix:    NET_INSTALL_AT_POWER_ON=0 (disabled)
+  
+  To verify your board's setting:
+  vcgencmd bootloader_config | grep NET_INSTALL
+
+================================================================================
+
+For more information, see BOOT_FIX_SUMMARY.md in the image builder repository.
+
+================================================================================

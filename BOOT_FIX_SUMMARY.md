@@ -8,8 +8,18 @@ The white/red screen with scrolling text on **cold boot only** (power-on) was ca
 
 - Newer 8GB RPi 5 boards ship with factory EEPROM that has this enabled by default
 - Shows "Install an OS" / Network Install UI on every cold power-up
-- Setting lives in board's SPI EEPROM, not on the SD card
+- **Setting lives in board's SPI EEPROM, not on the SD card**
 - Older 4GB boards had EEPROM that predates this feature
+
+## CRITICAL: Per-Board Configuration Required
+
+**This cannot be fixed in the SD card image**. The EEPROM is hardware on the Raspberry Pi board itself, separate from the SD card. This means:
+
+- ✅ Each physical RPi 5 board needs to be configured once
+- ✅ The setting persists even when you swap SD cards
+- ✅ You only need to fix it once per board, not once per image
+- ❌ You cannot "bake" this fix into an image file
+- ❌ Building the image with the fix only affects the build machine's board
 
 ## The Actual Fix
 
@@ -20,9 +30,18 @@ sudo raspi-config
 
 This writes `NET_INSTALL_AT_POWER_ON=0` to the EEPROM permanently.
 
-**Alternative command:**
+**Alternative command (if available):**
 ```bash
 sudo raspi-config nonint do_net_install 1  # 1 = disable
+```
+
+**Note**: The `do_net_install` function may not exist in older raspi-config versions (e.g., Bookworm legacy). If not available, the build script automatically falls back to direct EEPROM modification:
+
+```bash
+# Get current config, modify setting, and apply
+CURRENT_CONFIG=$(sudo rpi-eeprom-config)
+echo "$CURRENT_CONFIG" | sed 's/NET_INSTALL_AT_POWER_ON=1/NET_INSTALL_AT_POWER_ON=0/' > /tmp/bootconf.txt
+sudo rpi-eeprom-config --apply /tmp/bootconf.txt
 ```
 
 ## What We Changed (And Why)
@@ -88,16 +107,15 @@ These were attempts to fix the firmware UI issue via kernel/boot parameters (did
 
 The `build-fabmo-image.sh` script now:
 
-1. ✅ Configures EEPROM network install disable (THE ACTUAL FIX)
-   ```bash
-   raspi-config nonint do_net_install 1
-   ```
+1. ✅ Applies cleaner boot parameters (loglevel=3, not 0)
 
-2. ✅ Applies cleaner boot parameters (loglevel=3, not 0)
+2. ✅ Skips UART disable (unnecessary, blocks debugging)
 
-3. ✅ Skips UART disable (unnecessary, blocks debugging)
+3. ✅ Maintains all valuable Plymouth/auto-login configurations
 
-4. ✅ Maintains all valuable Plymouth/auto-login configurations
+4. ✅ Includes note that EEPROM settings are per-board, not per-image
+
+5. ❌ Does NOT configure EEPROM (cannot be baked into image - must be done per-board)
 
 ## Scripts Available
 
@@ -152,13 +170,17 @@ Both should produce identical clean boot sequences.
 
 ## Documentation Updates
 
-- **PROCEDUREdetails.txt**: Updated with EEPROM fix in boot optimization notes
+- **PROCEDUREdetails.txt**: Updated with post-installation EEPROM fix instructions for end users
+- **README.md**: Clarifies EEPROM fix is per-board, not per-image
 - **BOOT_FIX_SUMMARY.md**: This document (technical reference)
-- **build-fabmo-image.sh**: Comments explain the actual fix vs. nice-to-have improvements
+- **build-fabmo-image.sh**: Removed EEPROM modification (cannot be baked into image)
 
 ## Future Considerations
 
 - EEPROM settings may change in future RPi 5 hardware revisions
 - Always check `vcgencmd bootloader_config` on new boards
+- Consider creating a welcome screen or first-run script that reminds users to disable Network Install UI
+- Document this requirement in distribution materials and setup guides
+- Serial console (UART) may be needed for debugging - settings allow re-enabling if needed
 - Consider documenting other EEPROM settings that might affect FabMo
 - Serial console (UART) may be needed for debugging - settings allow re-enabling if needed

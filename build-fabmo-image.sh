@@ -172,14 +172,9 @@ EOF
     echo "System Configurations set."
     echo ""
     
-    # CRITICAL FIX for RPi 5 white/red screen on cold boot
-    # Newer RPi 5 boards have NET_INSTALL_AT_POWER_ON=1 in EEPROM by default
-    # This shows "Install an OS" / Network Install UI on every cold power-up
-    # Disable it to prevent white/red console screen
-    echo "Disabling network install UI in EEPROM..."
-    raspi-config nonint do_net_install 1  # 1 = disable
-    echo "Network install UI disabled."
-    echo ""
+    # NOTE: EEPROM settings (like NET_INSTALL_AT_POWER_ON) are stored in the board's
+    # hardware, not on the SD card. They must be configured per-board after flashing.
+    # See post-installation notes for RPi 5 EEPROM configuration if needed.
 }
 
 # Copy all network, user utility, and system files
