@@ -420,7 +420,7 @@ load_and_initialize_systemd_services() {
     done    
     
     echo "Creating systemd sym-links listed files in fabmo/files/network_conf_fabmo ..."
-    SERVICES=("network-monitor.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
+    SERVICES=("network-monitor.service" "setup-wlan0_ap.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
     for SERVICE in "${SERVICES[@]}"; do
         if [ -f "/fabmo/files/network_conf_fabmo/$SERVICE" ]; then
             if [ ! -L "/etc/systemd/system/$SERVICE" ]; then
@@ -484,6 +484,7 @@ EOF
     systemctl enable fabmo.service
     systemctl enable fabmo-updater.service
     systemctl enable network-monitor.service
+    systemctl enable setup-wlan0_ap.service
     systemctl enable camera-server-1.service
     systemctl enable camera-server-2.service
     systemctl enable usb_logger.service
