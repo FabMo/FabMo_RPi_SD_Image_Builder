@@ -7,6 +7,7 @@ FABMO_RESOURCE_DIR="/fabmo/files"
 # Clean any existing install
 clean() {
     rm -rf /fabmo
+    rm -rf /fabmo-def
     rm -rf /fabmo-updater
     rm -rf /opt/fabmo
     rm -rf /opt/fabmo_backup
@@ -420,7 +421,7 @@ load_and_initialize_systemd_services() {
     done    
     
     echo "Creating systemd sym-links listed files in fabmo/files/network_conf_fabmo ..."
-    SERVICES=("network-monitor.service" "setup-wlan0_ap.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
+    SERVICES=("network-monitor.service" "setup-wlan0_ap.service")
     for SERVICE in "${SERVICES[@]}"; do
         if [ -f "/fabmo/files/network_conf_fabmo/$SERVICE" ]; then
             if [ ! -L "/etc/systemd/system/$SERVICE" ]; then
@@ -481,13 +482,30 @@ EOF
 
     echo "Enabling systemd services..."
     systemctl daemon-reload
+    
+    # Enable core FabMo services (should always exist)
     systemctl enable fabmo.service
     systemctl enable fabmo-updater.service
-    systemctl enable network-monitor.service
-    systemctl enable setup-wlan0_ap.service
     systemctl enable camera-server-1.service
     systemctl enable camera-server-2.service
     systemctl enable usb_logger.service
+    
+    # Enable network services (only if they exist - may not be in older FabMo versions)
+    if [ -L "/etc/systemd/system/network-monitor.service" ] || [ -f "/etc/systemd/system/network-monitor.service" ]; then
+        systemctl enable network-monitor.service
+        echo "Enabled network-monitor.service"
+    else
+        echo "Skipping network-monitor.service (not found)"
+    fi
+    
+    if [ -L "/etc/systemd/system/setup-wlan0_ap.service" ] || [ -f "/etc/systemd/system/setup-wlan0_ap.service" ]; then
+        systemctl enable setup-wlan0_ap.service
+        echo "Enabled setup-wlan0_ap.service"
+    else
+        echo "WARNING: setup-wlan0_ap.service not found - AP SSID will not show IP address"
+        echo "         This service needs to be added to FabMo-Engine repo at:"
+        echo "         /fabmo/files/network_conf_fabmo/setup-wlan0_ap.service"
+    fi
 
     echo "Systemd services setup complete."
     echo ""
