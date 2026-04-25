@@ -47,26 +47,25 @@ FINAL THINGS to take care of here to make ready for part B.
 
 
 PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized Working-OS-Image from PART A)
-7. Copy the "Working-OS-Image" to an SD-card, with Balena Etcher. THIS will now be the SD card FOR our FabMo-RPi-SD-Image BUILD !
+7. Copy the "Working-OS-Image" to an SD-card, with Balena Etcher e.g.(wrk-OS-base-4-19-26-m.img). THIS will now become the SD card FOR our FabMo-RPi-SD-Image BUILD !
 8. Boot up this card up on a Raspberry Pi (I have been using RPi5):
     - Go to Preferences > RPi COnfiguration > Interfaces > and turn SSH on if it is not (already is)
 
 9. Open up an ssh terminal connection (pi;shopbot), THEN DO:
     Put a temporary copy of this repo on the pi:  
-    cd /
-    sudo git clone https://github.com/fabmo/FabMo_RPi_SD_Image_Builder Image_Builder
+                       cd /
+                       sudo git clone https://github.com/fabmo/FabMo_RPi_SD_Image_Builder Image_Builder
     Then:
-    cd /home/pi
-    seems to already exist/// sudo mkdir Scripts
-    (make this executable) sudo chmod +x Scripts
-    [copy into this new folder (you can use WinSCP logged on as pi) from "Image_Builder" current local repo]:
+    - Switch to WinSCP to make a little easier (needs to be one you have set up as user pi for copying, etc)
+    - /home/pi/Scripts should exist, but make it fully writable/executable with WinSCP properties
+    - copy and paste into Scripts from "Image_Builder" current local repo:
 	    resources [folder]
-        ?? tools [folder] ??
       	build-fabmo-image.sh
     Then make this last file executable by anyone, 777    
 10. NEXT DO: 
-	From Terminal:  cd /home/pi/Scripts  
-	                sudo ./build-fabmo-image.sh
+	From Terminal:
+                        cd /home/pi/Scripts  
+	                    sudo ./build-fabmo-image.sh
 
 12. WHEN the script is finished running, check to make sure things got installed and permissions look right.
     -Run boot diagnostic:  /home/pi/Scripts/resources/check-boot-config.sh
@@ -168,6 +167,8 @@ Some details:
                      network-monitor.sh
                      network-monitor.service
                      setup-wlan0_ap.service  **CRITICAL for AP SSID with IP address**
+                     export-netcfg-thumbdrive.service
+                     export-netcfg-thumbdrive.path
                      fabmo-ip-reporting.desktop (autostart for desktop IP display)
                /fabmo-updater/files:
                    fabmo-updater.service
@@ -192,18 +193,16 @@ Some details:
 NOTES FROM AI RE: above
 -----------------------------------------------------------------------------------------
 Summary Table - FabMo Network Services
-File/Directory	                    Source Repo	          Managed By	        Current Status
-network-monitor.sh	                FabMo-Engine	      FabMo updates	      ✅ Yes (script exists)
+File/Directory	                    Source Repo	          Managed By	        Used In Build
+network-monitor.sh	                FabMo-Engine	      FabMo updates	      ✅ Yes (script)
 network-monitor.service             FabMo-Engine          FabMo updates       ✅ Yes (symlinked + enabled)
-setup-wlan0_ap.service              FabMo-Engine          FabMo updates       ❌ MISSING FROM REPO [CRITICAL]
-fabmo-ip-reporting.desktop          FabMo-Engine          FabMo updates       ✅ Yes (autostart installed)
+setup-wlan0_ap.service              FabMo-Engine          FabMo updates       ✅ Yes (symlinked + enabled) **CRITICAL**
+fabmo-ip-reporting.desktop          FabMo-Engine          FabMo updates       ✅ Yes (autostart)
 ip-reporting.py	                    FabMo-Engine	      FabMo updates	      ✅ Yes (called by desktop)
 dnsmasq/*.conf	                    This repo	          Image builds only   ✅ Yes (copied to /etc)
 hostapd/*	                        This repo	          Image builds only   ✅ Yes (copied to /etc)
 NetworkManager/*	                This repo	          Image builds only   ✅ Yes (copied to /etc)
 
-**CRITICAL ISSUE**: setup-wlan0_ap.service is MISSING from FabMo-Engine repository!
-                    - This is why AP SSID doesn't show IP address
-                    - Service needs to be added to: /fabmo/files/network_conf_fabmo/
-                    - See MISSING_SERVICES.md for details and workarounds
-                    - Build will complete but AP feature will be degraded
+**CRITICAL**: setup-wlan0_ap.service is responsible for updating the Access Point SSID with
+              the current IP address. Without this service enabled, the AP name will not show
+              the IP address even though ip-reporting.py displays it on the desktop correctly.
