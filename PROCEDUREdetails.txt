@@ -47,26 +47,25 @@ FINAL THINGS to take care of here to make ready for part B.
 
 
 PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized Working-OS-Image from PART A)
-7. Copy the "Working-OS-Image" to an SD-card, with Balena Etcher. THIS will now be the SD card FOR our FabMo-RPi-SD-Image BUILD !
+7. Copy the "Working-OS-Image" to an SD-card, with Balena Etcher e.g.(wrk-OS-base-4-19-26-m.img). THIS will now become the SD card FOR our FabMo-RPi-SD-Image BUILD !
 8. Boot up this card up on a Raspberry Pi (I have been using RPi5):
     - Go to Preferences > RPi COnfiguration > Interfaces > and turn SSH on if it is not (already is)
 
 9. Open up an ssh terminal connection (pi;shopbot), THEN DO:
     Put a temporary copy of this repo on the pi:  
-    cd /
-    sudo git clone https://github.com/fabmo/FabMo_RPi_SD_Image_Builder Image_Builder
+                       cd /
+                       sudo git clone https://github.com/fabmo/FabMo_RPi_SD_Image_Builder Image_Builder
     Then:
-    cd /home/pi
-    seems to already exist/// sudo mkdir Scripts
-    (make this executable) sudo chmod +x Scripts
-    [copy into this new folder (you can use WinSCP logged on as pi) from "Image_Builder" current local repo]:
+    - Switch to WinSCP to make a little easier (needs to be one you have set up as user pi for copying, etc)
+    - /home/pi/Scripts should exist, but make it fully writable/executable with WinSCP properties
+    - copy and paste into Scripts from "Image_Builder" current local repo:
 	    resources [folder]
-        ?? tools [folder] ??
       	build-fabmo-image.sh
     Then make this last file executable by anyone, 777    
 10. NEXT DO: 
-	From Terminal:  cd /home/pi/Scripts  
-	                sudo ./build-fabmo-image.sh
+	From Terminal:
+                        cd /home/pi/Scripts  
+	                    sudo ./build-fabmo-image.sh
 
 12. WHEN the script is finished running, check to make sure things got installed and permissions look right.
     -Run boot diagnostic:  /home/pi/Scripts/resources/check-boot-config.sh
