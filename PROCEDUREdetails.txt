@@ -71,10 +71,10 @@ PART B. ##### MAKING the FabMo-RPi-SD-Image (based on downloaded and initialized
     -Run boot diagnostic:  /home/pi/Scripts/resources/check-boot-config.sh
        (This checks that all RPi 5 boot display settings are correctly applied)
     -Run AP services diagnostic:  /home/pi/Scripts/resources/check-ap-services.sh
-       (This checks that setup-wlan0_ap.service is enabled - critical for AP SSID with IP)
+       (This checks that setup_wlan0_ap.service is enabled - critical for AP SSID with IP)
     -If boot display or login issues occur, run: sudo /home/pi/Scripts/resources/fix-cold-boot-and-login.sh
     -If AP SSID doesn't show IP, run: sudo /home/pi/Scripts/resources/fix-ap-ssid.sh
-       (This enables setup-wlan0_ap.service - run BEFORE cleanup!)
+       (This enables setup_wlan0_ap.service - run BEFORE cleanup!)
 
 13. Run cleanup script and do additional UI adjustments:
     -Run cleanup:  sudo /home/pi/Scripts/resources/cleanup-build.sh
@@ -166,7 +166,7 @@ Some details:
                  /fabmo/files/network_conf_fabmo:
                      network-monitor.sh
                      network-monitor.service
-                     setup-wlan0_ap.service  **CRITICAL for AP SSID with IP address**
+                     setup_wlan0_ap.service  **CRITICAL for AP SSID with IP address**
                      export-netcfg-thumbdrive.service
                      export-netcfg-thumbdrive.path
                      fabmo-ip-reporting.desktop (autostart for desktop IP display)
@@ -196,13 +196,13 @@ Summary Table - FabMo Network Services
 File/Directory	                    Source Repo	          Managed By	        Used In Build
 network-monitor.sh	                FabMo-Engine	      FabMo updates	      ✅ Yes (script)
 network-monitor.service             FabMo-Engine          FabMo updates       ✅ Yes (symlinked + enabled)
-setup-wlan0_ap.service              FabMo-Engine          FabMo updates       ✅ Yes (symlinked + enabled) **CRITICAL**
+setup_wlan0_ap.service              FabMo-Engine          FabMo updates       ✅ Yes (symlinked + enabled) **CRITICAL**
 fabmo-ip-reporting.desktop          FabMo-Engine          FabMo updates       ✅ Yes (autostart)
 ip-reporting.py	                    FabMo-Engine	      FabMo updates	      ✅ Yes (called by desktop)
 dnsmasq/*.conf	                    This repo	          Image builds only   ✅ Yes (copied to /etc)
 hostapd/*	                        This repo	          Image builds only   ✅ Yes (copied to /etc)
 NetworkManager/*	                This repo	          Image builds only   ✅ Yes (copied to /etc)
 
-**CRITICAL**: setup-wlan0_ap.service is responsible for updating the Access Point SSID with
+**CRITICAL**: setup_wlan0_ap.service is responsible for updating the Access Point SSID with
               the current IP address. Without this service enabled, the AP name will not show
               the IP address even though ip-reporting.py displays it on the desktop correctly.

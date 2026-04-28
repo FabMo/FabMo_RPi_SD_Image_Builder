@@ -354,8 +354,11 @@ setup_fabmo() {
 #                                                                            /resources/hostapd/
 #                                                                                         hostapd.conf
 #                                                                                         hostapd.service
+# IMPORTANT: The hostapd service is DISABLED because NetworkManager manages the AP via wlan0_ap connection.
+#            The config files are installed for reference/fallback but standalone hostapd should not run.
 make_misc_tool_symlinks () {
     # hostapd configuration file (will not be updated with fabmo update)
+    # NOTE: This is a fallback config - NetworkManager manages the actual AP
     mkdir -p /etc/hostapd
     install_file "$RESOURCE_DIR/hostapd/hostapd.conf" "/etc/hostapd/hostapd.conf"
     install_file "$RESOURCE_DIR/hostapd/hostapd.service" "/lib/systemd/system/hostapd.service"
@@ -366,7 +369,10 @@ make_misc_tool_symlinks () {
     chmod 755 /run/hostapd
     systemctl unmask hostapd
     systemctl daemon-reload
-    systemctl enable hostapd
+    # NOTE: hostapd should NOT be enabled when NetworkManager manages the AP
+    # NetworkManager uses its own internal hostapd for the wlan0_ap connection
+    # Enabling standalone hostapd causes conflicts with the SSID not updating
+    systemctl disable hostapd
 
     # Key dnsmasq configuration files (will not be updated with fabmo update)
     install_file "$RESOURCE_DIR/dnsmasq/dnsmasq.conf" "/etc/dnsmasq.conf"
@@ -420,7 +426,7 @@ load_and_initialize_systemd_services() {
     done    
     
     echo "Creating systemd sym-links listed files in fabmo/files/network_conf_fabmo ..."
-    SERVICES=("network-monitor.service" "setup-wlan0_ap.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
+    SERVICES=("network-monitor.service" "setup_wlan0_ap.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
     for SERVICE in "${SERVICES[@]}"; do
         if [ -f "/fabmo/files/network_conf_fabmo/$SERVICE" ]; then
             if [ ! -L "/etc/systemd/system/$SERVICE" ]; then
@@ -484,7 +490,7 @@ EOF
     systemctl enable fabmo.service
     systemctl enable fabmo-updater.service
     systemctl enable network-monitor.service
-    systemctl enable setup-wlan0_ap.service
+    systemctl enable setup_wlan0_ap.service
     systemctl enable camera-server-1.service
     systemctl enable camera-server-2.service
     systemctl enable usb_logger.service

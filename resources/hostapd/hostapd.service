@@ -1,6 +1,6 @@
 [Unit]
 Description=Access point and authentication server for Wi-Fi and Ethernet
-After=network.target setup-wlan0_ap.service
+After=network.target setup_wlan0_ap.service
 Wants=network-online.target
 
 [Service]
