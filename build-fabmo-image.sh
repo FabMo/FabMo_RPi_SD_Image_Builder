@@ -187,6 +187,14 @@ copy_all_files() {
     # NetworkManager make sure we have the right permissions on these files, they are sensitive
     chmod 600 /etc/NetworkManager/system-connections/*
     
+    # NetworkManager dispatcher for automatic AP channel syncing
+    mkdir -p /etc/NetworkManager/dispatcher.d
+    if [ -d "$RESOURCE_DIR/NetworkManager/dispatcher.d" ]; then
+        copy_files "$RESOURCE_DIR/NetworkManager/dispatcher.d" "/etc/NetworkManager/dispatcher.d"
+        chmod 755 /etc/NetworkManager/dispatcher.d/*
+        echo "Installed NetworkManager dispatcher scripts"
+    fi
+    
     # User Utilities
     mkdir -p /home/pi/Scripts
     install_file "$RESOURCE_DIR/fabmo.bashrc" "/home/pi/.bashrc"
@@ -490,7 +498,8 @@ EOF
     systemctl enable fabmo.service
     systemctl enable fabmo-updater.service
     systemctl enable network-monitor.service
-    systemctl enable setup_wlan0_ap.service
+    # NOTE: setup_wlan0_ap.service is NOT enabled at boot - it's only called by ip-reporting.py
+    # when the SSID needs to be updated. NetworkManager auto-connects wlan0_ap on boot.
     systemctl enable camera-server-1.service
     systemctl enable camera-server-2.service
     systemctl enable usb_logger.service

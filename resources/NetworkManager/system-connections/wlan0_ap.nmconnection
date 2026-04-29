@@ -8,6 +8,8 @@ timestamp=1726515983
 [wifi]
 mode=ap
 ssid=fabmoAp_
+band=bg
+channel=6
 
 [ipv4]
 address1=192.168.42.1/24
