@@ -18,13 +18,20 @@ Files from FabMo-Engine at `/fabmo/files/network_conf_fabmo/`:
 
 - **setup_wlan0_ap.service** - Systemd service for AP SSID management
 - **setup_wlan0_ap.sh** - Script that restarts hostapd for AP
+- **fabmo-ip-reporting.service** - Systemd service for continuous IP reporting and AP SSID updates (May 2026)
+  - Runs ip-reporting.py as a system service
+  - Auto-restarts on failure
+  - Survives FabMo restarts/updates
 - **ip-reporting.py** - Python script that:
   - Displays IP address on desktop
   - Updates AP SSID to include IP address
   - Monitors network connections (eth > wifi > ap priority)
 - **ip-reporting.sh** - Shell wrapper that launches ip-reporting.py
+- **sync-ap-channel.sh** - Script that automatically syncs AP band/channel to match WiFi client (April 2026)
+  - Called by NetworkManager dispatcher when wlan0 connects
+  - Ensures concurrent AP+WiFi works on single radio hardware
 
-**Critical Note**: The `setup_wlan0_ap.service` and `setup_wlan0_ap.sh` files were accidentally deleted from FabMo-Engine in early 2026 and restored in April 2026. These files are **essential** for the AP SSID to show the current IP address.
+**Critical Note**: The `setup_wlan0_ap.service` and `setup_wlan0_ap.sh` files were accidentally deleted from FabMo-Engine in early 2026 and restored in April 2026. As of May 2026, the new `fabmo-ip-reporting.service` is the primary method for maintaining AP SSID with IP address, making these files vestigial but kept for backward compatibility.
 
 ### tools/
 
@@ -40,10 +47,15 @@ During the SD card image build process (`build-fabmo-image.sh`):
 
 1. **FabMo-Engine** is cloned/installed to `/fabmo`
 2. **Symlinks** are created from `/etc/systemd/system/` to the service files in `/fabmo/files/network_conf_fabmo/`
-3. **Services** are enabled: `systemctl enable setup_wlan0_ap.service`
+3. **Services** are enabled: 
+   - `systemctl enable setup_wlan0_ap.service` (legacy, vestigial)
+   - `systemctl enable fabmo-ip-reporting.service` (primary method as of May 2026)
 4. **Tool scripts** are symlinked to `/usr/local/bin/`
+5. **Desktop autostart** installed as fallback: `/etc/xdg/autostart/fabmo-ip-reporting.desktop`
 
 This allows FabMo updates to update these files without requiring a full image rebuild.
+
+**Important**: As of May 2026, `fabmo-ip-reporting.service` is the primary method for maintaining the AP SSID with the current IP address. This systemd service survives FabMo restarts and updates, solving the issue where the AP name reverted to "fabmoAP" after `systemctl stop/start fabmo.service`.
 
 ## Redundancy Considerations
 

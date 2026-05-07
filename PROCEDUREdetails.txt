@@ -167,9 +167,10 @@ Some details:
                      network-monitor.sh
                      network-monitor.service
                      setup_wlan0_ap.service  **CRITICAL for AP SSID with IP address**
+                     fabmo-ip-reporting.service  **CRITICAL for AP SSID with IP address**
                      export-netcfg-thumbdrive.service
                      export-netcfg-thumbdrive.path
-                     fabmo-ip-reporting.desktop (autostart for desktop IP display)
+                     fabmo-ip-reporting.desktop (autostart for desktop IP display - kept as fallback)
                /fabmo-updater/files:
                    fabmo-updater.service
                /usr/local/bin:
@@ -197,12 +198,13 @@ File/Directory	                    Source Repo	          Managed By	        Used
 network-monitor.sh	                FabMo-Engine	      FabMo updates	      ✅ Yes (script)
 network-monitor.service             FabMo-Engine          FabMo updates       ✅ Yes (symlinked + enabled)
 setup_wlan0_ap.service              FabMo-Engine          FabMo updates       ✅ Yes (symlinked + enabled) **CRITICAL**
-fabmo-ip-reporting.desktop          FabMo-Engine          FabMo updates       ✅ Yes (autostart)
-ip-reporting.py	                    FabMo-Engine	      FabMo updates	      ✅ Yes (called by desktop)
+fabmo-ip-reporting.service          FabMo-Engine          FabMo updates       ✅ Yes (symlinked + enabled) **CRITICAL**
+fabmo-ip-reporting.desktop          FabMo-Engine          FabMo updates       ✅ Yes (autostart fallback)
+ip-reporting.py	                    FabMo-Engine	      FabMo updates	      ✅ Yes (called by service)
 dnsmasq/*.conf	                    This repo	          Image builds only   ✅ Yes (copied to /etc)
 hostapd/*	                        This repo	          Image builds only   ✅ Yes (copied to /etc)
 NetworkManager/*	                This repo	          Image builds only   ✅ Yes (copied to /etc)
 
-**CRITICAL**: setup_wlan0_ap.service is responsible for updating the Access Point SSID with
-              the current IP address. Without this service enabled, the AP name will not show
-              the IP address even though ip-reporting.py displays it on the desktop correctly.
+**CRITICAL**: Both setup_wlan0_ap.service and fabmo-ip-reporting.service are responsible for 
+              updating the Access Point SSID with the current IP address. fabmo-ip-reporting.service
+              runs continuously as a systemd service and survives FabMo restarts/updates.

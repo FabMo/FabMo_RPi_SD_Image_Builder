@@ -434,7 +434,7 @@ load_and_initialize_systemd_services() {
     done    
     
     echo "Creating systemd sym-links listed files in fabmo/files/network_conf_fabmo ..."
-    SERVICES=("network-monitor.service" "setup_wlan0_ap.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
+    SERVICES=("network-monitor.service" "setup_wlan0_ap.service" "fabmo-ip-reporting.service" "export-netcfg-thumbdrive.service" "export-netcfg-thumbdrive.path")
     for SERVICE in "${SERVICES[@]}"; do
         if [ -f "/fabmo/files/network_conf_fabmo/$SERVICE" ]; then
             if [ ! -L "/etc/systemd/system/$SERVICE" ]; then
@@ -475,7 +475,8 @@ load_and_initialize_systemd_services() {
     After=network-online.target
     Wants=network-online.target
 EOF
-    # Install autostart for ip-reporting, method should work for generic user in bookworm 
+    # Install autostart for ip-reporting as fallback (systemd service is primary method)
+    # Desktop autostart kept for backward compatibility and as fallback
     install_file "/fabmo/files/network_conf_fabmo/fabmo-ip-reporting.desktop" "/etc/xdg/autostart/fabmo-ip-reporting.desktop"
     chmod -x /etc/xdg/autostart/fabmo-ip-reporting.desktop
     
@@ -498,6 +499,7 @@ EOF
     systemctl enable fabmo.service
     systemctl enable fabmo-updater.service
     systemctl enable network-monitor.service
+    systemctl enable fabmo-ip-reporting.service
     # NOTE: setup_wlan0_ap.service is NOT enabled at boot - it's only called by ip-reporting.py
     # when the SSID needs to be updated. NetworkManager auto-connects wlan0_ap on boot.
     systemctl enable camera-server-1.service
