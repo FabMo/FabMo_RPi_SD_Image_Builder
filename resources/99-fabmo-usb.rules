@@ -8,5 +8,11 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="1d50", ATTRS{idProduct}=="606d", SYMLINK+="f
 SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d3", SYMLINK+="vfdACM_controller1"
 # Sparkfun USB to RS485 
 SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="vfdUSB_controller1"
-# Delta USB to RS485 Std ShopBot 
-SUBSYSTEM=="usb", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="83c4", SYMLINK+="vfdUSB_controller1"
+
+# Delta IFD6500 USB to RS485 Std ShopBot — custom Silicon Labs VID/PID (10c4:83c4).
+# Standard cp210x driver doesn't claim this PID by default, so on USB add we
+# (1) ensure cp210x is loaded and (2) register this VID/PID with it so a tty appears.
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="83c4", \
+  RUN+="/bin/sh -c '/sbin/modprobe cp210x; echo 10c4 83c4 > /sys/bus/usb-serial/drivers/cp210x/new_id'"
+# Then symlink the resulting tty to the same name FabMo's spindle config expects.
+SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="83c4", SYMLINK+="vfdACM_controller1"
