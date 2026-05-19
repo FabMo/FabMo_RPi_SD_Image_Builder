@@ -2,7 +2,7 @@
 # Check Tailscale Remote Support Status for FabMo
 # Shows whether remote support is enabled and connection details
 #
-# Usage: /opt/fabmo/scripts/check-tailscale-status.sh
+# Usage: /fabmo-support/scripts/check-tailscale-status.sh
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -25,7 +25,7 @@ if ! command -v tailscale &> /dev/null; then
     echo "Current state: Inactive (not connected)"
     echo ""
     echo "To enable remote support:"
-    echo "  sudo /opt/fabmo/scripts/enable-tailscale-support.sh"
+    echo "  sudo /fabmo-support/scripts/enable-tailscale-support.sh"
     echo ""
     exit 0
 fi
@@ -59,14 +59,14 @@ if systemctl is-active --quiet tailscaled; then
     echo ""
     
     echo "To disable remote support:"
-    echo "  sudo /opt/fabmo/scripts/disable-tailscale-support.sh"
+    echo "  sudo /fabmo-support/scripts/disable-tailscale-support.sh"
 else
     echo -e "${RED}✗ Remote support is DISABLED${NC}"
     echo ""
     echo "Tailscale is installed but not connected."
     echo ""
     echo "To enable remote support:"
-    echo "  sudo /opt/fabmo/scripts/enable-tailscale-support.sh"
+    echo "  sudo /fabmo-support/scripts/enable-tailscale-support.sh"
 fi
 
 echo ""

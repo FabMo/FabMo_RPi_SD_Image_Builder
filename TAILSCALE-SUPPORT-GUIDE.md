@@ -72,7 +72,7 @@ For production use, disable "Reusable" to generate one-time keys per customer fo
    To enable remote support on your FabMo system:
    
    1. Open a terminal on your FabMo system
-   2. Run: sudo /opt/fabmo/scripts/enable-tailscale-support.sh
+   2. Run: sudo /fabmo-support/scripts/enable-tailscale-support.sh
    3. Enter the authentication key when prompted: [INSERT KEY]
    4. Confirm completion
    
@@ -88,8 +88,8 @@ For production use, disable "Reusable" to generate one-time keys per customer fo
    Your system is now connected for remote support.
    
    You can:
-   - Check status: /opt/fabmo/scripts/check-tailscale-status.sh
-   - Disable support: sudo /opt/fabmo/scripts/disable-tailscale-support.sh
+   - Check status: /fabmo-support/scripts/check-tailscale-status.sh
+   - Disable support: sudo /fabmo-support/scripts/disable-tailscale-support.sh
    - View our access: https://login.tailscale.com
    ```
 
@@ -150,7 +150,7 @@ tailscale ssh pi@fabmo-abc12345
 3. **Communicate:** Explain to customer what was fixed
 4. **Optional:** Ask customer if they want to disable Tailscale:
    ```
-   sudo /opt/fabmo/scripts/disable-tailscale-support.sh
+   sudo /fabmo-support/scripts/disable-tailscale-support.sh
    ```
 5. **Remove device** from Tailscale if using ephemeral keys (automatic) or manually if needed
 
@@ -249,7 +249,7 @@ when needed.
 Important: This feature is disabled by default and only activates when 
 you choose to enable it.
 
-For more information, see: /opt/fabmo/README-TAILSCALE.txt on your system
+For more information, see: /fabmo-support/README-TAILSCALE.txt on your system
 
 If you need remote assistance, contact us and we'll guide you through 
 the simple activation process.
@@ -263,7 +263,7 @@ Subject: Remote Support Access Instructions
 To allow our support team to assist you remotely:
 
 1. Open a terminal on your FabMo system
-2. Run: sudo /opt/fabmo/scripts/enable-tailscale-support.sh
+2. Run: sudo /fabmo-support/scripts/enable-tailscale-support.sh
 3. Enter this authentication key: [KEY]
 4. Reply to confirm connection
 
@@ -287,8 +287,8 @@ Summary:
 
 Your remote support connection is still active. You can:
 - Leave it enabled for future support (no security concern)
-- Disable it by running: sudo /opt/fabmo/scripts/disable-tailscale-support.sh
-- Check status anytime: /opt/fabmo/scripts/check-tailscale-status.sh
+- Disable it by running: sudo /fabmo-support/scripts/disable-tailscale-support.sh
+- Check status anytime: /fabmo-support/scripts/check-tailscale-status.sh
 
 Thank you for using FabMo!
 ```

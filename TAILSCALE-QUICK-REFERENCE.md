@@ -5,7 +5,7 @@
 1. **Generate/provide auth key** (from https://login.tailscale.com/admin/settings/keys)
 2. **Send customer instructions:**
    ```bash
-   sudo /opt/fabmo/scripts/enable-tailscale-support.sh
+   sudo /fabmo-support/scripts/enable-tailscale-support.sh
    # Enter auth key when prompted
    ```
 3. **Verify connection** in admin console
@@ -34,19 +34,19 @@ tailscale ssh pi@fabmo-abc12345
 
 ### Enable Support
 ```bash
-sudo /opt/fabmo/scripts/enable-tailscale-support.sh
+sudo /fabmo-support/scripts/enable-tailscale-support.sh
 ```
 
 ### Check Status
 ```bash
-/opt/fabmo/scripts/check-tailscale-status.sh
+/fabmo-support/scripts/check-tailscale-status.sh
 # or manually:
 tailscale status
 ```
 
 ### Disable Support
 ```bash
-sudo /opt/fabmo/scripts/disable-tailscale-support.sh
+sudo /fabmo-support/scripts/disable-tailscale-support.sh
 ```
 
 ### View IP

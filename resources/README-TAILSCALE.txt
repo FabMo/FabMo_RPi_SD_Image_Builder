@@ -32,7 +32,7 @@ This FabMo system includes **Tailscale** - optional remote support software that
 
 ### Check Current Status
 ```bash
-/opt/fabmo/scripts/check-tailscale-status.sh
+/fabmo-support/scripts/check-tailscale-status.sh
 ```
 
 ### Enable Remote Support
@@ -42,7 +42,7 @@ When you need help from FabMo support:
 2. Support will provide you with an authentication key
 3. Run the activation script:
    ```bash
-   sudo /opt/fabmo/scripts/enable-tailscale-support.sh
+   sudo /fabmo-support/scripts/enable-tailscale-support.sh
    ```
 4. Enter the authentication key when prompted
 5. Support team can now help you remotely
@@ -50,7 +50,7 @@ When you need help from FabMo support:
 ### Disable Remote Support
 When you no longer need remote assistance:
 ```bash
-sudo /opt/fabmo/scripts/disable-tailscale-support.sh
+sudo /fabmo-support/scripts/disable-tailscale-support.sh
 ```
 
 ---
@@ -92,8 +92,8 @@ This completely removes Tailscale from your system.
 2. Check that you're using a valid authentication key
 3. Try disabling and re-enabling:
    ```bash
-   sudo /opt/fabmo/scripts/disable-tailscale-support.sh
-   sudo /opt/fabmo/scripts/enable-tailscale-support.sh
+   sudo /fabmo-support/scripts/disable-tailscale-support.sh
+   sudo /fabmo-support/scripts/enable-tailscale-support.sh
    ```
 
 ### Check service status manually
@@ -137,6 +137,8 @@ For more information or questions about remote support:
 **Configuration:** `/etc/default/tailscaled`  
 **State Directory:** `/var/lib/tailscale/`  
 **Service:** `tailscaled.service` (systemd)
+**Scripts:** `/fabmo-support/scripts/`
+**Documentation:** `/fabmo-support/README-TAILSCALE.txt`
 
 **Default State:** Installed but disabled  
 **Network:** Outbound HTTPS only (443), no listening ports  

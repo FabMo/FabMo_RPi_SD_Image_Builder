@@ -21,20 +21,20 @@ This implementation adds optional remote support capability to FabMo SD card ima
 - Prompts for authentication key (provided by support team)
 - Enables and starts Tailscale service
 - Configures connection with security best practices
-- **Location:** `/opt/fabmo/scripts/enable-tailscale-support.sh`
+- **Location:** `/fabmo-support/scripts/enable-tailscale-support.sh`
 
 #### `resources/disable-tailscale-support.sh`
 - Disconnects from Tailscale network
 - Stops and disables Tailscale service
 - Returns system to default secure state
-- **Location:** `/opt/fabmo/scripts/disable-tailscale-support.sh`
+- **Location:** `/fabmo-support/scripts/disable-tailscale-support.sh`
 
 #### `resources/check-tailscale-status.sh`
 - Shows current connection status
 - Displays Tailscale IP addresses
 - Provides access information for support team
 - Lists available commands
-- **Location:** `/opt/fabmo/scripts/check-tailscale-status.sh`
+- **Location:** `/fabmo-support/scripts/check-tailscale-status.sh`
 
 ### 3. Documentation
 
@@ -45,7 +45,7 @@ This implementation adds optional remote support capability to FabMo SD card ima
 - Usage instructions
 - Troubleshooting guide
 - **Locations:** 
-  - `/opt/fabmo/README-TAILSCALE.txt`
+  - `/fabmo-support/README-TAILSCALE.txt`
   - `/home/pi/Desktop/README-TAILSCALE.txt` (visible on desktop)
 
 #### `TAILSCALE-SUPPORT-GUIDE.md`
@@ -72,10 +72,10 @@ This implementation adds optional remote support capability to FabMo SD card ima
 - Installation is optional (script checks for existence)
 
 **Changes to `copy_all_files()` function:**
-- Copies management scripts to `/opt/fabmo/scripts/`
-- Copies README to desktop and /opt/fabmo/
+- Copies management scripts to `/fabmo-support/scripts/`
+- Copies README to desktop and `/fabmo-support/`
 - Sets correct permissions (executable for scripts)
-- Creates `/opt/fabmo/scripts/` directory if needed
+- Creates `/fabmo-support/scripts/` directory if needed
 
 **Changes to completion message:**
 - Adds information about Tailscale feature
@@ -128,7 +128,7 @@ This implementation adds optional remote support capability to FabMo SD card ima
 
 3. **Verify scripts are installed:**
    ```bash
-   ls -la /opt/fabmo/scripts/
+   ls -la /fabmo-support/scripts/
    # Should show:
    # - enable-tailscale-support.sh (executable)
    # - disable-tailscale-support.sh (executable)
@@ -137,7 +137,7 @@ This implementation adds optional remote support capability to FabMo SD card ima
 
 4. **Verify documentation:**
    ```bash
-   ls -la /opt/fabmo/README-TAILSCALE.txt
+   ls -la /fabmo-support/README-TAILSCALE.txt
    ls -la /home/pi/Desktop/README-TAILSCALE.txt
    ```
 
@@ -155,7 +155,7 @@ systemctl is-active tailscaled   # Should output: inactive
 ss -tuln | grep tailscale        # Should show nothing
 
 # Check status script
-/opt/fabmo/scripts/check-tailscale-status.sh
+/fabmo-support/scripts/check-tailscale-status.sh
 # Should indicate: "Remote support is DISABLED"
 ```
 
@@ -164,14 +164,14 @@ ss -tuln | grep tailscale        # Should show nothing
 # You'll need a Tailscale auth key for this test
 # Generate one at: https://login.tailscale.com/admin/settings/keys
 
-sudo /opt/fabmo/scripts/enable-tailscale-support.sh
+sudo /fabmo-support/scripts/enable-tailscale-support.sh
 # Follow prompts, enter auth key
 # Should connect successfully
 
 # Verify connection
 tailscale status
 tailscale ip
-/opt/fabmo/scripts/check-tailscale-status.sh
+/fabmo-support/scripts/check-tailscale-status.sh
 ```
 
 #### Test 3: Access from Support Machine
@@ -188,7 +188,7 @@ ssh pi@100.x.y.z  # Should be able to login
 
 #### Test 4: Disable Support
 ```bash
-sudo /opt/fabmo/scripts/disable-tailscale-support.sh
+sudo /fabmo-support/scripts/disable-tailscale-support.sh
 
 # Verify disconnection
 tailscale status  # Should show: Logged out
@@ -213,7 +213,7 @@ which tailscale  # Should show nothing
 #### Test with FabMo Services
 ```bash
 # Enable Tailscale
-sudo /opt/fabmo/scripts/enable-tailscale-support.sh
+sudo /fabmo-support/scripts/enable-tailscale-support.sh
 
 # Verify FabMo still works correctly
 systemctl status fabmo
@@ -320,8 +320,8 @@ If you need to remove Tailscale from the build:
 3. **For existing deployed systems:**
    ```bash
    sudo apt remove --purge tailscale
-   sudo rm -rf /opt/fabmo/scripts/*tailscale*
-   sudo rm -rf /opt/fabmo/README-TAILSCALE.txt
+   sudo rm -rf /fabmo-support/scripts/*tailscale*
+   sudo rm -rf /fabmo-support/README-TAILSCALE.txt
    ```
 
 ## Cost Considerations

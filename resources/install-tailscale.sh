@@ -22,4 +22,4 @@ systemctl stop tailscaled 2>/dev/null || true
 systemctl disable tailscaled
 
 echo "Tailscale installed successfully (disabled by default)"
-echo "To enable remote support, run: /opt/fabmo/scripts/enable-tailscale-support.sh"
+echo "To enable remote support, run: /fabmo-support/scripts/enable-tailscale-support.sh"

@@ -2,7 +2,7 @@
 # Enable Tailscale Remote Support for FabMo
 # This script activates remote support access via Tailscale VPN
 # 
-# Usage: sudo /opt/fabmo/scripts/enable-tailscale-support.sh
+# Usage: sudo /fabmo-support/scripts/enable-tailscale-support.sh
 
 set -e
 
@@ -99,7 +99,7 @@ if [ $? -eq 0 ]; then
     echo "Useful commands:"
     echo "  - Check status:   tailscale status"
     echo "  - View IP:        tailscale ip"
-    echo "  - Disconnect:     sudo /opt/fabmo/scripts/disable-tailscale-support.sh"
+    echo "  - Disconnect:     sudo /fabmo-support/scripts/disable-tailscale-support.sh"
     echo "  - Web console:    https://login.tailscale.com"
     echo ""
 else

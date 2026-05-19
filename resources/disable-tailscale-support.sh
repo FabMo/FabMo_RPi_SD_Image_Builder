@@ -2,7 +2,7 @@
 # Disable Tailscale Remote Support for FabMo
 # This script deactivates remote support access
 #
-# Usage: sudo /opt/fabmo/scripts/disable-tailscale-support.sh
+# Usage: sudo /fabmo-support/scripts/disable-tailscale-support.sh
 
 set -e
 
@@ -42,5 +42,5 @@ echo ""
 echo -e "${GREEN}✓ Tailscale remote support is now DISABLED${NC}"
 echo ""
 echo "Your system is no longer accessible via Tailscale."
-echo "To re-enable support, run: sudo /opt/fabmo/scripts/enable-tailscale-support.sh"
+echo "To re-enable support, run: sudo /fabmo-support/scripts/enable-tailscale-support.sh"
 echo ""
