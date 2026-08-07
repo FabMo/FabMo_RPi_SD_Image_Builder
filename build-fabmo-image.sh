@@ -187,6 +187,13 @@ copy_all_files() {
     # NetworkManager make sure we have the right permissions on these files, they are sensitive
     chmod 600 /etc/NetworkManager/system-connections/*
     
+    # Protect connection files with immutable flags to prevent accidental deletion
+    echo "Protecting NetworkManager connections with immutable flags..."
+    chattr +i /etc/NetworkManager/system-connections/lan-connection 2>/dev/null || true
+    chattr +i /etc/NetworkManager/system-connections/direct-connection 2>/dev/null || true
+    chattr +i /etc/NetworkManager/system-connections/wlan0_ap.nmconnection 2>/dev/null || true
+    echo "  ✓ Connection profiles protected against accidental deletion"
+    
     # NetworkManager dispatcher for automatic AP channel syncing
     mkdir -p /etc/NetworkManager/dispatcher.d
     if [ -d "$RESOURCE_DIR/NetworkManager/dispatcher.d" ]; then
