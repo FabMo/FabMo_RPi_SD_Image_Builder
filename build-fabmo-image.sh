@@ -46,6 +46,17 @@ install_packages_and_configure() {
     debconf-set-selections <<< "jackd2 jackd/tweak_rt_limits boolean true"
     echo "Packages installed."
     echo ""
+    
+    # Install Tailscale for optional remote support (disabled by default)
+    echo "Installing Tailscale (optional remote support - disabled by default)..."
+    if [ -f "$RESOURCE_DIR/install-tailscale.sh" ]; then
+        chmod +x "$RESOURCE_DIR/install-tailscale.sh"
+        bash "$RESOURCE_DIR/install-tailscale.sh"
+        echo "Tailscale installed (inactive until user enables it)."
+    else
+        echo "WARNING: Tailscale installation script not found, skipping."
+    fi
+    echo ""
 }
 
 # Setup System Configuration (country also done is basic first start of OS download)
@@ -295,6 +306,36 @@ EOF
     install_file "$RESOURCE_DIR/virtual-keyboard.desktop" "/home/pi/.local/share/applications/virtual-keyboard.desktop"
     chmod +x /usr/bin/toggle-wvkbd.sh
     chmod +x /home/pi/.local/share/applications/virtual-keyboard.desktop
+
+    # Tailscale remote support scripts (opt-in only)
+    # Using /fabmo-support/ to survive FabMo updates (which delete /opt/fabmo/)
+    echo "Installing Tailscale management scripts..."
+    mkdir -p /fabmo-support/scripts
+    if [ -f "$RESOURCE_DIR/enable-tailscale-support.sh" ]; then
+        install_file "$RESOURCE_DIR/enable-tailscale-support.sh" "/fabmo-support/scripts/enable-tailscale-support.sh"
+        chmod +x /fabmo-support/scripts/enable-tailscale-support.sh
+    fi
+    if [ -f "$RESOURCE_DIR/disable-tailscale-support.sh" ]; then
+        install_file "$RESOURCE_DIR/disable-tailscale-support.sh" "/fabmo-support/scripts/disable-tailscale-support.sh"
+        chmod +x /fabmo-support/scripts/disable-tailscale-support.sh
+    fi
+    if [ -f "$RESOURCE_DIR/check-tailscale-status.sh" ]; then
+        install_file "$RESOURCE_DIR/check-tailscale-status.sh" "/fabmo-support/scripts/check-tailscale-status.sh"
+        chmod +x /fabmo-support/scripts/check-tailscale-status.sh
+    fi
+    # Install verification script for testing
+    if [ -f "$RESOURCE_DIR/verify-tailscale-install.sh" ]; then
+        install_file "$RESOURCE_DIR/verify-tailscale-install.sh" "/fabmo-support/scripts/verify-tailscale-install.sh"
+        chmod +x /fabmo-support/scripts/verify-tailscale-install.sh
+    fi
+    # Install Tailscale README for users
+    if [ -f "$RESOURCE_DIR/README-TAILSCALE.txt" ]; then
+        install_file "$RESOURCE_DIR/README-TAILSCALE.txt" "/fabmo-support/README-TAILSCALE.txt"
+        install_file "$RESOURCE_DIR/README-TAILSCALE.txt" "/home/pi/Desktop/README-TAILSCALE.txt"
+        chmod 644 /fabmo-support/README-TAILSCALE.txt
+        chmod 644 /home/pi/Desktop/README-TAILSCALE.txt
+    fi
+    echo "Tailscale management scripts installed."
 
     echo "Network, user utility, and system files copied."
     echo ""
@@ -558,6 +599,13 @@ main_installation() {
     echo ""
     echo "NOTE: Boot display optimized for RPi 5 - clean FabMo logo, no scrolling messages"
     echo "      Run check-boot-config.sh to verify all settings"
+    echo ""
+    echo "TAILSCALE REMOTE SUPPORT:"
+    echo "  - Installed but DISABLED by default (no security impact)"
+    echo "  - Documentation: /fabmo-support/README-TAILSCALE.txt"
+    echo "  - Verify install: /fabmo-support/scripts/verify-tailscale-install.sh"
+    echo "  - Enable: sudo /fabmo-support/scripts/enable-tailscale-support.sh"
+    echo "  - Status: /fabmo-support/scripts/check-tailscale-status.sh"
     echo ""
     echo ""
 }
