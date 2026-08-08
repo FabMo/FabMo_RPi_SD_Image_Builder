@@ -98,11 +98,13 @@ echo "Setting permissions on connection profiles (600 for security)..."
 chmod 600 /etc/NetworkManager/system-connections/* 2>/dev/null || true
 
 # Make connection files immutable to prevent accidental deletion
-echo "Setting immutable flags on connection profiles to prevent accidental deletion..."
+# NOTE: wlan0_ap.nmconnection is NOT protected because its SSID is dynamically updated
+#       by ip-reporting.py to broadcast the current IP address
+echo "Setting immutable flags on static connection profiles to prevent accidental deletion..."
 chattr +i /etc/NetworkManager/system-connections/lan-connection 2>/dev/null || true
 chattr +i /etc/NetworkManager/system-connections/direct-connection 2>/dev/null || true
-chattr +i /etc/NetworkManager/system-connections/wlan0_ap.nmconnection 2>/dev/null || true
-echo "  ✓ Connection profiles protected (use 'chattr -i' to modify)"
+echo "  ✓ Static connection profiles protected (lan-connection, direct-connection)"
+echo "  ℹ wlan0_ap remains writable for dynamic SSID updates"
 
 # NetworkManager dispatcher scripts
 echo ""
@@ -172,10 +174,9 @@ echo "Backup of original files saved to: $BACKUP_DIR"
 echo ""
 echo "Restored configurations:"
 echo "  ✓ NetworkManager connection profiles:"
-echo "      - lan-connection (DHCP on LAN)"
-echo "      - direct-connection (192.168.44.1 static)"
-echo "      - wlan0_ap (Access Point at 192.168.42.1)"
-echo "  ✓ Connection profiles protected with immutable flag"
+echo "      - lan-connection (DHCP on LAN) [protected]"
+echo "      - direct-connection (192.168.44.1 static) [protected]"
+echo "      - wlan0_ap (Access Point at 192.168.42.1) [writable for SSID updates]"
 echo "  ✓ NetworkManager dispatcher (AP channel sync)"
 echo "  ✓ dnsmasq configurations (ap-only, direct-mode)"
 echo "  ✓ Active mode: ap-only (safe for LAN connections)"
@@ -196,8 +197,9 @@ echo "  sudo nmcli connection up lan-connection"
 echo "  sudo nmcli connection up direct-connection"
 echo "  sudo nmcli connection up wlan0_ap"
 echo ""
-echo "IMPORTANT: Connection profiles are now protected with immutable flags."
+echo "IMPORTANT: Static connection profiles (lan/direct) are protected with immutable flags."
 echo "           This prevents accidental deletion via NetworkManager UI."
+echo "           The wlan0_ap connection remains writable for dynamic SSID updates."
 echo "           To modify a protected connection:"
 echo "             sudo chattr -i /etc/NetworkManager/system-connections/[connection-name]"
 echo "             # make your changes"

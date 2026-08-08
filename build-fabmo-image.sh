@@ -198,12 +198,14 @@ copy_all_files() {
     # NetworkManager make sure we have the right permissions on these files, they are sensitive
     chmod 600 /etc/NetworkManager/system-connections/*
     
-    # Protect connection files with immutable flags to prevent accidental deletion
-    echo "Protecting NetworkManager connections with immutable flags..."
+    # Protect static connection files with immutable flags to prevent accidental deletion
+    # NOTE: wlan0_ap.nmconnection is NOT protected because its SSID is dynamically updated
+    #       by ip-reporting.py to broadcast the current IP address
+    echo "Protecting static NetworkManager connections with immutable flags..."
     chattr +i /etc/NetworkManager/system-connections/lan-connection 2>/dev/null || true
     chattr +i /etc/NetworkManager/system-connections/direct-connection 2>/dev/null || true
-    chattr +i /etc/NetworkManager/system-connections/wlan0_ap.nmconnection 2>/dev/null || true
-    echo "  ✓ Connection profiles protected against accidental deletion"
+    echo "  ✓ Static connection profiles protected (lan-connection, direct-connection)"
+    echo "  ℹ wlan0_ap remains writable for dynamic SSID updates"
     
     # NetworkManager dispatcher for automatic AP channel syncing
     mkdir -p /etc/NetworkManager/dispatcher.d
