@@ -1,0 +1,27 @@
+[connection]
+id=direct-connection
+uuid=88544818-a952-412f-b0ed-1fa3914f7bc5
+type=ethernet
+autoconnect=false
+interface-name=eth0
+
+[ethernet]
+# Mobile USB-Ethernet adapters benefit from explicit MTU
+mtu=1500
+
+[ipv4]
+address1=192.168.44.1/24
+method=manual
+dns=192.168.44.1;
+# Faster DNS timeout for mobile devices
+dns-priority=100
+
+[ipv6]
+# MOBILE OPTIMIZATION: Changed from 'ignore' to 'link-local'
+# Modern mobile devices (Android 10+, iOS 13+) expect IPv6 to at least respond
+# Link-local provides IPv6 addressing without routing, satisfying mobile OS checks
+method=link-local
+# Optionally, you could use 'disabled' but link-local is better for compatibility
+# method=disabled
+
+[proxy]
