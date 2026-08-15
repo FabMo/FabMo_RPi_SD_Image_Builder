@@ -3,6 +3,8 @@ Procedure to make NEW RPi SD Card Image
 *NEW
 -clean screen for RPi-5
 
+*** CHECK!!! to make sure patches 1, 2 and 3 are all added (3 should be for sure, already)
+
 ---------------------------------------
 
 * EASIEST TO already HAVE A KEYBOARD AND TRACK PAD or MOUSE PLUGGED into Raspberry Pi when doing these things!
@@ -37,6 +39,7 @@ PART A. ##### MAKING the Working-OS-Image (once we have an image we are happy wi
     - using "Using only partitions with data" does not help size issue
     
 FINAL THINGS to take care of here to make ready for part B.
+*** CHECK!!! to make sure patches 1, 2 and 3 are all added (3 should be for sure, already)
 -- YOU ARE DOING THIS in this repo and COMMITTING and PUSHING !!!
   [ LAST IMAGE VERSION = 26-12]
 --UPDATE VERSION IN ==>   fabmo-release.txt (2 places in this file)    [this will go in /boot(where viewable from SD on Windows PC) and /etc] {{JUST INCREMENT THESE SEQUENTIALLY, no dev versions}}
