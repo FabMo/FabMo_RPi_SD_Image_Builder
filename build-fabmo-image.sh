@@ -41,7 +41,7 @@ install_packages_and_configure() {
     wait_for_dpkg_lock
     echo "Updating package lists..."
     apt-get update
-    apt-get install -y bossa-cli hostapd dnsmasq xserver-xorg-input-libinput pi-package jackd2 python3-pyudev python3-tornado wvkbd dos2unix plymouth plymouth-themes
+    apt-get install -y bossa-cli hostapd dnsmasq xserver-xorg-input-libinput pi-package jackd2 python3-pyudev python3-tornado wvkbd dos2unix plymouth plymouth-themes avahi-daemon avahi-utils
     # Preconfigure jackd2 (audio) to allow real-time process priority
     debconf-set-selections <<< "jackd2 jackd/tweak_rt_limits boolean true"
     echo "Packages installed."
@@ -206,6 +206,32 @@ copy_all_files() {
     chattr +i /etc/NetworkManager/system-connections/direct-connection 2>/dev/null || true
     echo "  ✓ Static connection profiles protected (lan-connection, direct-connection)"
     echo "  ℹ wlan0_ap remains writable for dynamic SSID updates"
+    
+    # Avahi mDNS Configuration for fabmo.local access
+    echo "Installing Avahi mDNS configuration..."
+    if [ -d "$RESOURCE_DIR/avahi" ]; then
+        install_file "$RESOURCE_DIR/avahi/avahi-daemon.conf" "/etc/avahi/avahi-daemon.conf"
+        install_file "$RESOURCE_DIR/avahi/fabmo.service" "/etc/avahi/services/fabmo.service"
+        echo "  ✓ Avahi configs installed (fabmo.local hostname support)"
+    else
+        echo "  ⚠  Avahi resources not found, skipping (will use defaults)"
+    fi
+    
+    # dnsmasq Configuration for AP and Direct modes
+    echo "Installing dnsmasq configurations..."
+    if [ -d "$RESOURCE_DIR/dnsmasq" ]; then
+        mkdir -p /etc/dnsmasq.d
+        install_file "$RESOURCE_DIR/dnsmasq/ap-only.conf" "/etc/dnsmasq.d/ap-only.conf"
+        install_file "$RESOURCE_DIR/dnsmasq/direct-mode.conf" "/etc/dnsmasq.d/direct-mode.conf"
+        if [ -f "$RESOURCE_DIR/dnsmasq/direct-mode-mobile-optimized.conf" ]; then
+            install_file "$RESOURCE_DIR/dnsmasq/direct-mode-mobile-optimized.conf" "/etc/dnsmasq.d/direct-mode-mobile-optimized.conf"
+        fi
+        # Create default active-mode symlink (points to ap-only.conf by default)
+        ln -sf /etc/dnsmasq.d/ap-only.conf /etc/dnsmasq.d/active-mode.conf
+        echo "  ✓ dnsmasq configs installed (AP and Direct mode support)"
+    else
+        echo "  ⚠  dnsmasq resources not found, skipping"
+    fi
     
     # NetworkManager dispatcher for automatic AP channel syncing
     mkdir -p /etc/NetworkManager/dispatcher.d
@@ -555,6 +581,7 @@ EOF
     systemctl enable camera-server-1.service
     systemctl enable camera-server-2.service
     systemctl enable usb_logger.service
+    systemctl enable avahi-daemon.service
 
     echo "Systemd services setup complete."
     echo ""
