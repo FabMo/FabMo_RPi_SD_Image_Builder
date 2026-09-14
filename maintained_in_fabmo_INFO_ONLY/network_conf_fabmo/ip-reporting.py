@@ -5,6 +5,7 @@ import subprocess
 import syslog
 import time
 import json
+import re
 
 # Monitor the tool's connections every ~5s (depends on wlan rejection) -- 
 #     If we get a new -connection/interface- of a higher priority than current ( with: eth > wifi > ap )
@@ -30,6 +31,7 @@ class NetworkConfigApp:
         self.last_name = ""
         self.last_ssid = ""
         self.last_ip_address_wifi = ""
+        self.last_avahi_hostname = ""
         self.name_file = "/opt/fabmo/config/engine.json"
         self.initialize_ui()
         print("###===> Starting IP Address Display App ...")
@@ -87,7 +89,8 @@ class NetworkConfigApp:
         try:
             with open(self.name_file, "r") as f:
                 data = json.load(f)
-                self.tool_name = data.get('name', 'no-name').strip()
+                # prefer machine_name (user-settable) over legacy name field
+                self.tool_name = (data.get('machine_name') or data.get('name', 'no-name')).strip()
                 if len(self.tool_name) > 12:
                     self.tool_name = self.tool_name[:12]
                 return self.tool_name
@@ -149,6 +152,28 @@ class NetworkConfigApp:
         except Exception as e:
             print(f"Failed to write WiFi information to {file_path}: {e}")
             syslog.syslog(f"Failed to write WiFi information to {file_path}: {e }")
+
+    def sanitize_hostname(self, name):
+        """Convert a machine name to a valid mDNS hostname label."""
+        hostname = re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')[:63]
+        return hostname or 'fabmo'
+
+    def update_avahi_hostname(self, hostname):
+        conf_path = '/etc/avahi/avahi-daemon.conf'
+        try:
+            with open(conf_path, 'r') as f:
+                content = f.read()
+            updated = re.sub(r'^host-name=.*$', f'host-name={hostname}', content, flags=re.MULTILINE)
+            if updated == content:
+                return
+            with open(conf_path, 'w') as f:
+                f.write(updated)
+            subprocess.run('systemctl restart avahi-daemon', shell=True, check=True)
+            syslog.syslog(f'###=> Avahi hostname updated: {hostname}.local')
+            print(f'###=> Avahi hostname updated: {hostname}.local')
+        except Exception as e:
+            syslog.syslog(f'###=> Error updating Avahi hostname: {e}')
+            print(f'###=> Error updating Avahi hostname: {e}')
 
     def change_ssid(self, new_ssid):
         ap_connection_name = "wlan0_ap"  # Replace with your actual connection name
@@ -227,6 +252,11 @@ class NetworkConfigApp:
         if self.last_name != self.name:
             self.change_ssid(self.name)
             self.last_name = self.name
+
+        avahi_hostname = self.sanitize_hostname(self.tool_name)
+        if self.last_avahi_hostname != avahi_hostname:
+            self.update_avahi_hostname(avahi_hostname)
+            self.last_avahi_hostname = avahi_hostname
 
         syslog.syslog(f"###=> name={self.name} last_name={self.last_name}")
         syslog.syslog(f"      ip={self.ip_var.get()}")
