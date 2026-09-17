@@ -228,6 +228,13 @@ copy_all_files() {
         fi
         # Create default active-mode symlink (points to ap-only.conf by default)
         ln -sf /etc/dnsmasq.d/ap-only.conf /etc/dnsmasq.d/active-mode.conf
+        # Restart=on-failure drop-in so dnsmasq recovers from any transient bind failure
+        mkdir -p /etc/systemd/system/dnsmasq.service.d
+        cat > /etc/systemd/system/dnsmasq.service.d/fabmo-restart.conf <<'DROPIN'
+[Service]
+Restart=on-failure
+RestartSec=3
+DROPIN
         echo "  ✓ dnsmasq configs installed (AP and Direct mode support)"
     else
         echo "  ⚠  dnsmasq resources not found, skipping"
